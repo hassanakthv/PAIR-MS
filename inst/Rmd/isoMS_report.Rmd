@@ -574,11 +574,11 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot <- levels(aa_data$ion)[c(1,2,7,6)]
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, color=file)) + 
-    geom_point(size=0.1, alpha=0.2) + #geom_smooth() +
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -588,7 +588,7 @@ aa_data %>%
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=tic, y=gamma, color=group, group=file)) + 
-    geom_point(size=0.3, alpha=0.4) + #geom_smooth() +
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
     facet_grid(ion~.) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 

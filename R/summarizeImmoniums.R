@@ -84,7 +84,7 @@ summarizeImmoniums <- function(data = NA,
     ranges <- ranges %>%
       ungroup() %>%
       left_join(rranges, by = c("file", "peak")) %>%
-      mutate(isgood = peak == "0" | ((md < 10 * mmd) & (md/ir < 1) & (meansq < 1e-05) &
+      mutate(isgood = peak == "0" | ((md < 8 * mmd) & (md/ir < 1) & (meansq < 1e-06) &
         (abs(meanerror) < mass_tol))) %>% select(-mgg, -madgg, -mmd)
 
     data <- data %>%

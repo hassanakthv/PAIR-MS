@@ -574,7 +574,7 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-ion_plot <- levels(aa_data$ion)[c(1,4,3,5)]
+ion_plot <- levels(aa_data$ion)[c(1:4)]
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, color=file)) + 

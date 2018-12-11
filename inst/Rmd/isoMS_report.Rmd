@@ -129,7 +129,7 @@ ion_plot <- levels(aa_data$ion)[c(Pro,Leu,any,Hyp)]
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, group=file, color=group)) + 
-    geom_point(size=0.1, alpha=0.2) + #geom_smooth() +
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -139,7 +139,7 @@ aa_data %>%
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=tic, y=gamma, group=file, color=group)) + 
-    geom_point(size=0.3, alpha=0.4) + #geom_smooth() +
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -367,7 +367,7 @@ ion_plot <- levels(aa_data$ion)[c(Pro,Leu,any,Hyp)]
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, group=file,color=group)) + 
-    geom_point(size=0.1, alpha=0.2) + #geom_smooth() +
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -377,7 +377,7 @@ aa_data %>%
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=tic, y=gamma, group=file, color=group)) + 
-    geom_point(size=0.3, alpha=0.4) + #geom_smooth() +
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -816,7 +816,7 @@ if(length(vals)>0){
   aa_data %>% 
     filter(ion %in% ion_plot) %>% 
     ggplot(aes(x=rt/60, y=gamma, color=group, group=file)) + 
-      geom_point(size=0.1, alpha=0.2) + #geom_smooth() +
+      geom_point(size=1, alpha=0.2) + #geom_smooth() +
       theme_bw() + 
       facet_grid(.~ion) + 
       theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -826,7 +826,7 @@ if(length(vals)>0){
   aa_data %>% 
     filter(ion %in% ion_plot) %>% 
     ggplot(aes(x=tic, y=gamma, color=group, group=file)) + 
-      geom_point(size=0.1, alpha=0.2) + #geom_smooth() +
+      geom_point(size=1, alpha=0.2) + #geom_smooth() +
       theme_bw() + 
       facet_grid(ion~.) + 
       theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 

@@ -179,7 +179,7 @@ aa_data %>%
   arrange(tic) %>% 
   ggplot(aes(x=tic, y=mean,  color=group)) +
     geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
-    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) -> g_tic
+    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) + xlab(x = "TIC (Log10)") -> g_tic
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
@@ -411,7 +411,7 @@ aa_data %>%
   arrange(tic) %>% 
   ggplot(aes(x=tic, y=mean,  color=group)) +
     geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
-    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) -> g_tic
+    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) + xlab(x = "TIC (Log10)") -> g_tic
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
@@ -638,7 +638,7 @@ aa_data %>%
   arrange(tic) %>% 
   ggplot(aes(x=tic, y=mean,  color=group)) +
     geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
-    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) -> g_tic
+    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) + xlab(x = "TIC (Log10)") -> g_tic
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
@@ -858,7 +858,7 @@ if(length(vals)>0){
     arrange(tic) %>% 
     ggplot(aes(x=tic, y=mean,  color=group)) +
       geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
-      theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) -> g_tic
+      theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C')) + xlab(x = "TIC (Log10)")-> g_tic
   #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
   
   print(g_rt)

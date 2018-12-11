@@ -1,7 +1,9 @@
 ---
 title: "isoMS analysis report"
 author: "Alexey L. Chernobrovkin"
-#date: "6/29/2017"
+contributor:"Hassan Gharibi"
+
+#date: "12/11/2018"
 output: 
   html_document:
     theme: simplex
@@ -175,7 +177,7 @@ aa_data %>%
     sd = sd(gamma)*100, 
     se = sd(gamma)/sqrt(n())*100, 
     n=n(), 
-    tic=median(ldI,na.rm=T)) %>% 
+    tic=median(log10(tic),na.rm=T))) %>% 
   arrange(tic) %>% 
   ggplot(aes(x=tic, y=mean,  color=group)) +
     geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +

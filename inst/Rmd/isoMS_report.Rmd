@@ -120,7 +120,12 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-ion_plot <- levels(aa_data$ion)[1:4]
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+
+ion_plot <- levels(aa_data$ion)[c(Pro,Leu,any,Hyp)]
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, group=file, color=group)) + 
@@ -144,7 +149,7 @@ aa_data %>%
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot(position='dodge', outlier.color = NA, notch=T)  +
   theme_bw() +
-  theme(axis.text.x=element_blank())+ 
+  theme(axis.text.x=element_text(angle = 90, hjust = 1))+ 
   ylab(bquote(''^13*'C'/''^12*'C')) + xlab("") +
   facet_wrap(~ion) -> g_bp
 aa_data %>% 
@@ -351,7 +356,13 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-ion_plot <- levels(aa_data$ion)[1:4]
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+
+
+ion_plot <- levels(aa_data$ion)[c(Pro,Leu,any,Hyp)]
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -377,7 +388,7 @@ aa_data %>%
   filter(gamma>vmin & gamma<vmax) %>% 
   ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
   theme_bw() +
-  theme(legend.position = "")+ 
+  theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
   ylab(bquote(''^15*'N'/''^14*'N')) + xlab("") +
     facet_wrap(~ion) -> g_bp
 aa_data %>% 
@@ -574,7 +585,14 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-ion_plot <- levels(aa_data$ion)[c(1:4)]
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+
+
+ion_plot <- levels(aa_data$ion)[c(Pro,Leu,any,Hyp)]
+
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, color=file)) + 
@@ -597,7 +615,7 @@ aa_data %>%
 aa_data %>% 
   ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
   theme_bw() +
-  theme(legend.position = "")+ 
+  theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
   ylab(bquote(''^2*'H'/''^1*'H')) + xlab("") +
   facet_wrap(~ion) -> g_bp
 aa_data %>% 
@@ -817,7 +835,7 @@ if(length(vals)>0){
   aa_data %>% 
     ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
     theme_bw() +
-    theme(legend.position = "")+ 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     ylab(bquote(''^18*'O'/''^16*'O')) + xlab("") +
     facet_wrap(~ion) -> g_bp
   aa_data %>% 

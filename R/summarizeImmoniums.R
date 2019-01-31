@@ -65,7 +65,7 @@ summarizeImmoniums <- function(data = NA,
     data0 <- data.frame()
     
   for (s in IOI){
-      d0 <- data %>% filter(ion = s)
+      d0 <- data %>% filter(ion == s)
       data0 <- bind_rows(data0,d0)}    
 data <- data0
     # removing outliers

@@ -17,7 +17,7 @@ summarizeImmoniums <- function(data = NA,
                                               "file",
                                               NA),
                                resultPath = "./isoMS_result",
-                               correct=T) {
+                               correct=T, IOI = NA) {
     if (is.na(data)) {
         if (class(files) == "character")
             data <- bind_rows(lapply(files, function(f) {
@@ -62,9 +62,12 @@ summarizeImmoniums <- function(data = NA,
     spectra <- unique(data$seqNum)
     mono_spectra <- unique((data %>% filter(peak == "0"))$seqNum)
     nomono_spectra <- setdiff(spectra, mono_spectra)
-
-
-
+    data0 <- data.frame()
+    
+  for (s in IOI){
+      d0 <- data %>% filter(ion = s)
+      data0 <- bind_rows(data0,d0)}    
+data <- data0
     # removing outliers
     ranges <- data %>%
       group_by(file, peak, ion) %>%

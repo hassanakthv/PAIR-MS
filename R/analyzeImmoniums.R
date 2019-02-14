@@ -168,7 +168,7 @@ analyze_immoniums3 <- function(file, width=0.0015, ions=immoniumIons){
   result
 }
        
-       analyze_immoniums_ <- function(file, width=0.001, ions=AAIons, fixSigma=T){
+analyze_immoniums_ <- function(file, width=0.001, ions=AAIons, fixSigma=T){
   message(sprintf("Reading file [%s]", file))
   msrun <- openMSfile(file, backend = "Ramp")
   hd <- header(msrun)

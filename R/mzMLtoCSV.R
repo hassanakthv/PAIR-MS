@@ -145,7 +145,7 @@ mzMLtoCSV_ <- function(pattern = "*.mzML(.gz)?", width=0.001) {
             in_f <- file.path(dir_, ii)
             outf <- sub(".mzML(.gz)?$", "_fit.csv", in_f)
             if (!file.exists(outf)) {
-                xxx <- analyze_immoniums(in_f, ions = AAIons, width = width,
+                xxx <- analyze_immoniums_(in_f, ions = AAIons, width = width,
                   fixSigma = T)
                 write_csv(xxx, outf)
             } else # message(sprintf('File already processed: %s', outtile))
@@ -158,7 +158,7 @@ mzMLtoCSV_ <- function(pattern = "*.mzML(.gz)?", width=0.001) {
             in_f <- file.path(dir_, ii)
             outf <- sub(".mzML(.gz)?$", "_fit.csv", in_f)
             if (!file.exists(outf)) {
-                xxx <- analyze_immoniums(in_f, ions = AAIons, width = width,
+                xxx <- analyze_immoniums_(in_f, ions = AAIons, width = width,
                   fixSigma = T)
                 write_csv(xxx, outf)
             } else # message(sprintf('File already processed: %s', outtile))

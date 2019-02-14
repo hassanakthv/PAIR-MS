@@ -167,3 +167,4 @@ mzMLtoCSV_ <- function(pattern = "*.mzML(.gz)?", width=0.001) {
         }, mc.cores = ncpu, mc.preschedule = TRUE))
     }
     return(result)
+}

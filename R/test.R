@@ -169,4 +169,5 @@ if(F){
     mutate(peak=sub("C","13C",peak)) %>%
     mutate(peak=sub("N","15N",peak)) %>%
     mutate(peak=sub("H","2H",peak))-> lm_res
+
 }

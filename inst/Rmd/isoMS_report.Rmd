@@ -598,7 +598,7 @@ ion_plot <- IOI
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=rt/60, y=gamma, color=file)) + 
+  ggplot(aes(x=rt/60, y=gamma, group=file, color=group) + 
     geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
@@ -626,7 +626,7 @@ aa_data %>%
   ggplot(aes(x=gamma, fill=group, group=file)) + geom_density(alpha=0.3)  +
   theme_bw() +
   theme(legend.position = "")+ 
-  xlab(bquote(''^2*'H'/''^1*'H')) + xlab("density") -> g_density
+  xlab(bquote(''^2*'H'/''^1*'H')) + ylab("density") -> g_density
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   group_by(ion, group,file) %>% 

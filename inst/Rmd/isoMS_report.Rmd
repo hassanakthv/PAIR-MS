@@ -598,7 +598,7 @@ ion_plot <- IOI
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=rt/60, y=gamma, group=file, color=group) + 
+  ggplot(aes(x=rt/60, y=gamma, group=file, color=group)) + 
     geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 

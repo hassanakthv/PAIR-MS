@@ -125,7 +125,8 @@ Leu <- which(levels(aa_data$ion)=="L")
 any <- which(levels(aa_data$ion)=="any")
 Hyp <- which(levels(aa_data$ion)=="Hyp")
 
-ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, group=file, color=group)) + 
@@ -362,7 +363,8 @@ any <- which(levels(aa_data$ion)=="any")
 Hyp <- which(levels(aa_data$ion)=="Hyp")
 
 
-ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -591,7 +593,8 @@ any <- which(levels(aa_data$ion)=="any")
 Hyp <- which(levels(aa_data$ion)=="Hyp")
 
 
-ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -812,8 +815,10 @@ if(length(vals)>0){
     left_join(ldI_models, by=c('group','ion')) %>% 
     mutate(gamma=gamma - ldI*estimate)
   
-  ion_plot <- levels(aa_data$ion)[1:4]
-  aa_data %>% 
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI
+
+aa_data %>% 
     filter(ion %in% ion_plot) %>% 
     ggplot(aes(x=rt/60, y=gamma, color=group, group=file)) + 
       geom_point(size=1, alpha=0.2) + #geom_smooth() +

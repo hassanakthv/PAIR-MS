@@ -17,7 +17,7 @@ summarizeImmoniums <- function(data = NA,
                                               "file",
                                               NA),
                                resultPath = "./isoMS_result",
-                               correct=T, IOI = NA) {
+                               correct=T, IOI = NA, Info = NA) {
     if (is.na(data)) {
         if (class(files) == "character")
             data <- bind_rows(lapply(files, function(f) {
@@ -183,7 +183,7 @@ data <- data0
         all_aa <- data %>% filter(n > 0 & I > 0) %>% mutate(logI = log2(I)) %>%
             select(group, file, peak, gamma, logI, tic, ltic, dI, ldI, I0, seqNum,
                 rt, ion) %>% bind_rows(any_aa) %>% ungroup()
-        save(any_aa, all_aa, file = file.path(resultPath, "all_aa.RData"))
+        save(any_aa, all_aa, Info,file = file.path(resultPath, "all_aa.RData"))
         message("Performing LOESS method: ")
         cluster_copy(cl, all_aa)
         loess_C <- all_aa %>% ungroup() %>% distinct(group, file, ion) %>% arrange(ion, group,
@@ -219,7 +219,7 @@ data <- data0
             quantifyIsoRatio(data = all_aa, control = "Control", file = file_, ion = ion_,
                 peak = "18O") %>% mutate(file = file_, ion = ion_, group = group_)
         }) %>% collect() %>% ungroup()
-        save(any_aa, all_aa, loess_C, loess_N, loess_H, loess_O, file = file.path(resultPath,
+        save(any_aa, all_aa, loess_C, loess_N, loess_H, loess_O, Info, file = file.path(resultPath,
             "all_aa.RData"))
     }
 

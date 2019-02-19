@@ -13,7 +13,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(plotly)
 library(isoms)
 library(ggplot2)
 library(dplyr)
@@ -226,11 +225,11 @@ aa_data %>%
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
-print(ggplotly(g_rt))
-print(ggplotly(g_logI))
-print(ggplotly(g_bp))
-print(ggplotly(g_density))
-print(ggplotly(g_tic))
+print(g_rt)
+print(g_logI)
+print(g_bp)
+print(g_density)
+print(g_tic)
 ```
 
 

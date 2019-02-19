@@ -1,6 +1,6 @@
 ---
 title: "isoMS analysis report"
-author: "Alexey L. Chernobrovkin"
+author: "Alexey L. Chernobrovkin & Hassan Gharibi"
 #date: "6/29/2017"
 output: 
   html_document:
@@ -57,6 +57,27 @@ lm_res %>%
 
 ```
 -->
+
+```{r Experiment_info, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12, fig.height=12}
+info <- Info
+```
+
+
+## Experiment Information
+**Description:** *`r info$Description`*      
+**Aims:** *`r info$Aim`*     
+**Samples List:** *`r info$Samples`*   
+**Number of Samples:** *`r info$No.Sample`*   
+**Controls List:** *`r info$Controls`*   
+**Number of Controls:** *`r info$No.Controls`*   
+**Duration:** *`r info$Duration`* min     
+**Method:** *`r info$Method`*     
+**LC-Gradient:** *`r info$LC.Gradient`*     
+**Replicate:** *`r info$Replicates`*     
+**Exprimenter:** *`r info$Experimenter`*     
+**Date:** *`r info$Date`*    
+**Other:** *`r info$Other`*
+
 
 ## Aminoacid composition
 

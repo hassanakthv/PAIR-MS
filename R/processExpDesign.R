@@ -64,6 +64,6 @@ processExperimentDesign <- function(file="experimentDesign.csv",ioi=list(iointre
     summarizeImmoniums(data = data_,
                        group = "group",
                        resultPath = outdir,
-                       correct=correct,IOI = ioi, Info = expDesign[1,1:22])
+                       correct=correct,IOI = ioi, Info = expDesign[1,10:ncol(expDesign)])
 }
 

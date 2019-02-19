@@ -64,19 +64,39 @@ info <- Info
 
 
 ## Experiment Information
+
 **Description:** *`r info$Description`*      
+
 **Aims:** *`r info$Aim`*     
+
 **Samples List:** *`r info$Samples`*   
+
 **Number of Samples:** *`r info$No.Sample`*   
+
 **Controls List:** *`r info$Controls`*   
+
 **Number of Controls:** *`r info$No.Controls`*   
-**Duration:** *`r info$Duration`* min     
+
+**Number of Replicates:** *`r info$Replicates`*
+
+**Analysis Duration:** *`r info$Duration`* min     
+
 **Method:** *`r info$Method`*     
+
 **LC-Gradient:** *`r info$LC.Gradient`*     
-**Replicate:** *`r info$Replicates`*     
+     
+**MS1 Scans:** *`r info$MS1`*
+
+**MS2 Scans:** *`r info$MS2`*
+
+**Instrument:** *`r info$Instrument`*
+
 **Exprimenter:** *`r info$Experimenter`*     
+
 **Date:** *`r info$Date`*    
+
 **Other:** *`r info$Other`*
+
 
 
 ## Aminoacid composition

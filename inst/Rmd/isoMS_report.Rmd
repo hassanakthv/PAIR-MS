@@ -21,6 +21,7 @@ library(broom)
 library(gridExtra)
 library(DT)
 require(knitr)
+ggpl <- plotly::ggplotly
 
 ```
 
@@ -225,7 +226,7 @@ aa_data %>%
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
-print(g_rt)
+print(ggpl(g_rt))
 print(g_logI)
 print(g_bp)
 print(g_density)

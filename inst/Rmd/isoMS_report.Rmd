@@ -226,7 +226,7 @@ aa_data %>%
 
 #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
 
-ggpl(g_rt)
+print(g_rt)
 print(g_logI)
 print(g_bp)
 print(g_density)

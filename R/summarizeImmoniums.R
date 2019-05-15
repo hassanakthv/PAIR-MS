@@ -44,7 +44,7 @@ summarizeImmoniums <- function(data = NA,
     } else {
         data$tic <- 10
     }
-    mass_tol <- 4.5e-04
+    mass_tol <- 1e-03
     if (!("file" %in% names(data))) {
         data <- data %>% mutate(file = "file")
     }

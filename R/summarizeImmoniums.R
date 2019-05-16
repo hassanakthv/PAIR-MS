@@ -78,6 +78,45 @@ data <- data0
                 ir = median(isoratio, na.rm = T),
                 md = mad(isoratio/n, na.rm = T),
                 nhits = n(), mmin = gg - 3 * md, mmax = gg + 3 * md)
+  
+
+
+hf <- unique(data$file)
+hh <- data.frame()
+for(i in hf){
+  htemp <- data %>% filter(file == i)
+  hi <- unique(htemp$ion)
+  
+  for (j in hi){
+    htemp_ <- htemp %>% filter(ion == j) 
+    hp <- unique(htemp_$peak)
+    
+    for(k in hp){
+      
+      ref <- ranges %>% filter(file == i & ion == j & peak ==k)
+      hh_ <- htemp_ %>% filter(peak == k) %>% filter(peak == "0" | g_ > ref$mmin & g_<ref$mmax & R2 >0.9)
+      
+      hh <-rbind(hh,hh_) 
+      
+    }
+   }  
+}    
+ 
+  data <- hh
+   ranges <- data %>%
+      group_by(file, peak, ion) %>%
+      summarise(meanerror = mean(masserror),
+                medianerror = median(masserror),
+                meansq = mean(masserror^2),
+                gg = median(isoratio/n, na.rm = T),
+                ir = median(isoratio, na.rm = T),
+                md = mad(isoratio/n, na.rm = T),
+                nhits = n(), mmin = gg - 3 * md, mmax = gg + 3 * md)
+  
+  
+
+
+  
 
     rranges <- ranges %>%
       filter(nhits > 10 & gg > 0) %>%
@@ -87,7 +126,7 @@ data <- data0
     ranges <- ranges %>%
       ungroup() %>%
       left_join(rranges, by = c("file", "peak")) %>%
-      mutate(isgood = peak == "0" | ((md < 8 * mmd) & (md/ir < 1) & (meansq < 1e-06) &
+      mutate(isgood = peak == "0" | ((md/ir < 1) & (meansq < 1e-06) &
         (abs(meanerror) < mass_tol))) %>% select(-mgg, -madgg, -mmd)
 
     data <- data %>%

@@ -44,7 +44,7 @@ summarizeImmoniums <- function(data = NA,
     } else {
         data$tic <- 10
     }
-    mass_tol <- 1e-03
+    mass_tol <- 4e-03
     if (!("file" %in% names(data))) {
         data <- data %>% mutate(file = "file")
     }
@@ -79,7 +79,7 @@ data <- data0
                 md = mad(isoratio/n, na.rm = T),
                 nhits = n(), mmin = gg - 3 * md, mmax = gg + 3 * md)
   
-
+data <- data %>% mutate(g_ = isoratio/n)
 
 hf <- unique(data$file)
 hh <- data.frame()

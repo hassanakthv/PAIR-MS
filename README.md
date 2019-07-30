@@ -61,6 +61,8 @@ __MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microsc
 
 
 
-Then, use the ProcessExperiemntDesign() function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (ioi), and the second list is the amino acids that you want to see the graphs on them in the output result (ioi_). Note that the list can be a list or matrix of string where each amnino acids is shown with it's designated one letter code. For example : c("G","P","L") ---> Glycine, Proline and Leucine are amino acids that one is looking to analyze.
+Then, use the __ProcessExperiemntDesign()__ function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (_ioi_), and the second list is the amino acids that you want to see the graphs on them in the output result (*ioi_*). Note that the list can be a list or matrix of string where each amnino acid is shown with its designated one letter code. 
+
+For example : c("G","P","L") ---> Glycine, Proline and Leucine are amino acids that one is looking to analyze.
 
 

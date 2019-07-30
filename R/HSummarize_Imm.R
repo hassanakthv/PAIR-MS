@@ -26,12 +26,34 @@ HSummarize_Imm <- function(data = NA,
       }))
   }
   if (nrow(data) < 2) {
-    warning("You have to provide either data frame or vecor of file names to proceed")
-    return(0)
-  }
-  
-  
-  mass_tol <- 4e-03
+        warning("You have to provide either data frame or vecor of file names to proceed")
+        return(0)
+    }
+    if (!dir.exists(resultPath))
+        dir.create(resultPath, recursive = TRUE)
+
+    if ("totIonCurrent" %in% names(data))
+        data <- data %>% mutate(tic = totIonCurrent)
+    if ("tic" %in% names(data)) {
+        message("TIC adjustment")
+        TIClimits <- data %>% group_by(file) %>% summarize(minTIC = min(tic, na.rm = T),
+            maxTIC = max(tic, na.rm = T)) %>% summarize(low = max(c(2e+07, minTIC)),
+            high = min(maxTIC))
+       
+    } else {
+        data$tic <- 10
+    }
+    mass_tol <- 4e-03
+    if (!("file" %in% names(data))) {
+        data <- data %>% mutate(file = "file")
+    }
+    if (is.na(group))
+        group = "group"
+    if (!(group %in% names(data))) {
+        data <- data %>% mutate(group = "group")
+    } else if (group != "group") {
+        data <- data %>% mutate_(group = sprintf("`%s`", group))
+    }
   
   message("Files to process: ")
   print(unique(data$file))

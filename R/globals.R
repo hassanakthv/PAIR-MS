@@ -31,7 +31,7 @@ immoniumIons = list(
   "xC" = c("C" = 3, "H" = 10, "N" = 2, "S" = 1)
   )
 
-
+# Intact Amino Acid ions: AA +1Hydrogen (+H)
 AAIons = list(
   "P" = c("C" = 5, "H" = 10, "N" = 1,"O" = 2), 
   "Hyp" = c("C" = 5, "H" = 10, "N" = 1, "O" = 3), 

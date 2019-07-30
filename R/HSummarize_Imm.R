@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-summarizeImmoniums <- function(data = NA,
+HSummarize_Imm <- function(data = NA,
                                files = NA,
                                group = ifelse(is.na(data),
                                               "file",

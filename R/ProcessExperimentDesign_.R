@@ -1,4 +1,4 @@
-function (file = "experimentDesign.csv", ioi = list(iointrest), 
+processExperimentDesign_ <- function (file = "experimentDesign.csv", ioi = list(iointrest), 
           correct = TRUE) 
 {
   library(isoms)

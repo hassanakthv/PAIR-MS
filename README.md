@@ -1,4 +1,4 @@
-# isoms
+# IsoMS
 *Orbitrap IsoR MS data processing library*
 
 In order to measure the isotopic ratio of each elements (CHNO) in a given sample, you need to convert the .raw files to .mzML file using a converter software such as _MSConvertGUI_. In a routine experiemnt the isotopic ratio will be determined in MS/MS scans with HCD 50. To convert the file from routine platform one should __add HCD and MS 2__ as filters before converting the .raw to .mzML.

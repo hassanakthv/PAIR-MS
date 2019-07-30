@@ -21,7 +21,7 @@ library(broom)
 library(gridExtra)
 library(DT)
 require(knitr)
-ggpl <- plotly::ggplotly
+
 
 ```
 
@@ -168,7 +168,7 @@ any <- which(levels(aa_data$ion)=="any")
 Hyp <- which(levels(aa_data$ion)=="Hyp")
 
 ion_plot_ <- levels(aa_data$ion)[1:4]
-ion_plot <- IOI
+ion_plot <- IOI_
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=gamma, group=file, color=group)) + 
@@ -406,7 +406,7 @@ Hyp <- which(levels(aa_data$ion)=="Hyp")
 
 
 ion_plot_ <- levels(aa_data$ion)[1:4]
-ion_plot <- IOI
+ion_plot <- IOI_
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -636,7 +636,7 @@ Hyp <- which(levels(aa_data$ion)=="Hyp")
 
 
 ion_plot_ <- levels(aa_data$ion)[1:4]
-ion_plot <- IOI
+ion_plot <- IOI_
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -858,7 +858,7 @@ if(length(vals)>0){
     mutate(gamma=gamma - ldI*estimate)
   
 ion_plot_ <- levels(aa_data$ion)[1:4]
-ion_plot <- IOI
+ion_plot <- IOI_
 
 aa_data %>% 
     filter(ion %in% ion_plot) %>% 

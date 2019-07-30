@@ -6,7 +6,7 @@ In order to measure the isotopic ratio of each elements (CHNO) in a given sample
 To have a nice information about the samples and experiment, The first thing you need it to provide a .csv file (Experiment Design) with the name of these columsns in the same order:
 
 _Mandatory fields_
-
+***
 __File__ : Name of the file with .csv at the end
 
 __Sample__ : Name of the sample as you want to see in the result
@@ -24,9 +24,9 @@ __gN__ : 15N/14N ratio, if it is available
 __gH__ : 2H/1H ratio, if it is available
 
 __gO__ : 18O/16O ratio, if it is available
-
+***
 _Followed by experiment information - Note that the column header should be presented in the Experiment Design file but can be left out unfilled_
-
+***
 __Description__ : Information about the experiment
 
 __Aim__ : Goal of the experiment
@@ -58,8 +58,7 @@ __Instrument__: Specification on the used instruments
 __MS1__ : Specific details about MS scans, e.g. scan range, number of microscans...
 
 __MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microscans...
-
-
+***
 
 Then, use the __ProcessExperiemntDesign()__ function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (_ioi_), and the second list is the amino acids that you want to see the graphs on them in the output result (*ioi_*). Note that the list can be a list or matrix of string where each amino acid is shown with its designated one letter code. 
 

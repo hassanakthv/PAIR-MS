@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-processExperimentDesign <- function(file="experimentDesign.csv",ioi=list(iointrest), correct=TRUE) {
+processExperimentDesign <- function(file="experimentDesign.csv",ioi=list(iointrest), ioi_ = list(iontoshow),correct=TRUE) {
     library(isoms)
     args_ <- commandArgs(trailingOnly = TRUE)
     if(length(args_)>0){
@@ -64,6 +64,6 @@ processExperimentDesign <- function(file="experimentDesign.csv",ioi=list(iointre
     summarizeImmoniums(data = data_,
                        group = "group",
                        resultPath = outdir,
-                       correct=correct,IOI = ioi, Info = expDesign[1,10:ncol(expDesign)])
+                       correct=correct,IOI = ioi, Info = expDesign[1,10:ncol(expDesign)],IOI_ = ioi_)
 }
 

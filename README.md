@@ -24,20 +24,37 @@ __gN__ : 15N/14N ratio, if it is available
 __gH__ : 2H/1H ratio, if it is available
 
 __gO__ : 18O/16O ratio, if it is available
+
 _Followed by experiment information - Note that the column header should be presented in the Experiment Design file but can be left out unfilled_
+
 __Description__ : Information about the experiment
+
 __Aim__ : Goal of the experiment
+
 __Date__ : Date of experiment
+
 __Experimenter__ : Responsible person
+
 __Method__ : Method used in the analysis
+
 __No.Sample__ : Number of samples
+
 __Replicates__ : Number of replicate per each samples
+
 __Other__ : Any other information
+
 __Samples__ : Name of the samples
+
 __Controls__ : Name of the controls
+
 __No.Controls__: Number of controls
+
 __LC.Gradient__: Information about the LC separtion
+
 __Duration__ : Analysis duration time
+
 __Instrument__: Specification on the used instruments
+
 __MS1__ : Specific details about MS scans, e.g. scan range, number of microscans...
+
 __MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microscans...

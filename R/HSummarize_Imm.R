@@ -17,7 +17,7 @@ HSummarize_Imm <- function(data = NA,
                                               "file",
                                               NA),
                                resultPath = "./isoMS_result",
-                               correct=T, IOI = NA, Info = NA) {
+                               correct=T, IOI = NA, Info = NA, IOI_ = NA) {
   if (is.na(data)) {
     if (class(files) == "character")
       data <- bind_rows(lapply(files, function(f) {

@@ -1,9 +1,9 @@
 # isoms
 *Orbitrap IsoR MS data processing library*
 
-In order to measure the isotopic ratio of each elements (CHNO) in a given sample, you need to convert the .raw files to .mzML file using a converter software such as _MSConvertGUI_. In the routine platform the isotopic ratio will be determined in MS/MS scans with HCD 50. To convert the file from routine platform one should __add HCD and MS 2__ as filters before converting the .raw to .mzML.
+In order to measure the isotopic ratio of each elements (CHNO) in a given sample, you need to convert the .raw files to .mzML file using a converter software such as _MSConvertGUI_. In a routine experiemnt the isotopic ratio will be determined in MS/MS scans with HCD 50. To convert the file from routine platform one should __add HCD and MS 2__ as filters before converting the .raw to .mzML.
 
-To have a nice information about the samples and experiment, you should provide a .csv file (Experiment Design) with the name of these columsns in the same order:
+To have a nice information about the samples and experiment, The first thing you need it to provide a .csv file (Experiment Design) with the name of these columsns in the same order:
 
 _Mandatory fields_
 
@@ -58,3 +58,9 @@ __Instrument__: Specification on the used instruments
 __MS1__ : Specific details about MS scans, e.g. scan range, number of microscans...
 
 __MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microscans...
+
+
+
+Then, use the ProcessExperiemntDesign() function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (ioi), and the second list is the amino acids that you want to see the graphs on them in the output result (ioi_). Note that the list can be a list or matrix of string where each amnino acids is shown with it's designated one letter code. For example : c("G","P","L") ---> Glycine, Proline and Leucine are amino acids that one is looking to analyze.
+
+

@@ -19,40 +19,25 @@ __gO__ : 18O/16O ratio, if it is available
 ***
 _Followed by experiment information - Note that the column header should be presented in the Experiment Design file but can be left out unfilled_
 ***
-__Description__ : Information about the experiment
-
-__Aim__ : Goal of the experiment
-
-__Date__ : Date of experiment
-
-__Experimenter__ : Responsible person
-
-__Method__ : Method used in the analysis
-
-__No.Sample__ : Number of samples
-
-__Replicates__ : Number of replicate per each sample
-
-__Other__ : Any other information
-
-__Samples__ : Name of the samples
-
-__Controls__ : Name of the controls
-
-__No.Controls__: Number of controls
-
-__LC.Gradient__: Information about the LC separtion
-
-__Duration__ : Analysis duration time
-
-__Instrument__: Specification on the used instruments
-
-__MS1__ : Specific details about MS scans, e.g. scan range, number of microscans...
-
-__MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microscans...
+__Description__ : Information about the experiment  
+__Aim__ : Goal of the experiment  
+__Date__ : Date of experiment  
+__Experimenter__ : Responsible person  
+__Method__ : Method used in the analysis  
+__No.Sample__ : Number of samples  
+__Replicates__ : Number of replicate per each sample  
+__Other__ : Any other information  
+__Samples__ : Name of the samples  
+__Controls__ : Name of the controls  
+__No.Controls__: Number of controls  
+__LC.Gradient__: Information about the LC separtion  
+__Duration__ : Analysis duration time  
+__Instrument__: Specification on the used instruments  
+__MS1__ : Specific details about MS scans, e.g. scan range, number of microscans...  
+__MS2__ : Specific details about MS/MS scans, e.g. scan range, number of microscans...  
 ***
 
-Then, use the __ProcessExperiemntDesign()__ function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (_ioi_), and the second list is the amino acids that you want to see the graphs on them in the output result (*ioi_*). Note that the list can be a list or matrix of string where each amino acid is shown with its designated one letter code. 
+Then, use the __ProcessExperiemntDesign()__ function where you need to provide the above .csv file as the _file_ argument, and two list for amino acids of interest. The first list is for those amino acids that you want to analyze in your samples (_ioi_), and the second list is the amino acids that you want to see the graphs on them in the output result (*ioi_*).  Note that the list can be a list or matrix of string where each amino acid is shown with its designated one letter code. 
 
 For example : c("G","P","L") ---> Glycine, Proline and Leucine are amino acids that one is looking to analyze.
 

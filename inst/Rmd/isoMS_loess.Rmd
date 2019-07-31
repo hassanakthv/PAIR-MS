@@ -23,6 +23,49 @@ library(DT)
 require(knitr)
 
 ```
+-->
+
+
+```{r Experiment_info, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12, fig.height=12}
+info <- Info
+```
+
+
+## Experiment Information
+
+**Description:** *`r info$Description`*      
+
+**Aims:** *`r info$Aim`*     
+
+**Samples List:** *`r info$Samples`*   
+
+**Number of Samples:** *`r info$No.Sample`*   
+
+**Controls List:** *`r info$Controls`*   
+
+**Number of Controls:** *`r info$No.Controls`*   
+
+**Number of Replicates:** *`r info$Replicates`*
+
+**Analysis Duration:** *`r info$Duration`* min     
+
+**Method:** *`r info$Method`*     
+
+**LC-Gradient:** *`r info$LC.Gradient`*     
+     
+**MS1 Scans:** *`r info$MS1`*
+
+**MS2 Scans:** *`r info$MS2`*
+
+**Instrument:** *`r info$Instrument`*
+
+**Exprimenter:** *`r info$Experimenter`*     
+
+**Date:** *`r info$Date`*    
+
+**Other:** *`r info$Other`*
+
+
 
 
 ## Carbon: $$^{13}C/^{12}C$$ {.tabset}
@@ -46,6 +89,7 @@ aa_data <- loess_C %>%
 aa_data$ion <- factor(aa_data$ion, levels = (mmad %>% summarise(n=n(),md=mean(md)) %>% filter(md>0, n==nf) %>% arrange(md))$ion)
 
 ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
@@ -196,6 +240,7 @@ aa_data <- loess_N %>%
 aa_data$ion <- factor(aa_data$ion, levels = (mmad %>% summarise(n=n(),md=mean(md)) %>% filter(md>0, n==nf) %>% arrange(md))$ion)
 
 ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
@@ -346,6 +391,7 @@ aa_data <- loess_H %>%
 aa_data$ion <- factor(aa_data$ion, levels = (mmad %>% summarise(n=n(),md=mean(md)) %>% filter(md>0, n==nf) %>% arrange(md))$ion)
 
 ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
@@ -499,6 +545,7 @@ aa_data <- loess_O %>%
 aa_data$ion <- factor(aa_data$ion, levels = (mmad %>% summarise(n=n(),md=mean(md)) %>% filter(md>0, n==nf) %>% arrange(md))$ion)
 
 ion_plot <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 

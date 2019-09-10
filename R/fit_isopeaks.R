@@ -48,7 +48,7 @@ fit_isopeaks <- function(x, y, startPars = c(rc = 0.02, rn = 0.003, rh = 4e-04, 
         ## Perform fit
         while (repeatLoop & attempts < maxAttempts) {
             parTmp <- startPars * (1 + varyPars * (runif(1, -0.1, 0.1)))
-            m <- try(nls(formula = fitFct, start = parTmp, data = list(x = xVec, y = yVec), na.action = na.exclude, algorithm = "port"), silent = TRUE)
+            m <- try(nlsML(formula = fitFct, start = parTmp, data = list(x = xVec, y = yVec), na.action = na.exclude, algorithm = "port"), silent = TRUE)
             attempts <- attempts + 1
             varyPars <- 1
             if (class(m) != "try-error") {

@@ -28,7 +28,9 @@ immoniumIons = list(
   "M" = c("C" = 4, "H" = 10, "N" = 1, "S" = 1),
   "C" = c("C" = 2, "H" = 6, "N" = 1, "S" = 1),
   "camC" = c("C" = 4, "H" = 9, "N" = 2, "S" = 1, "O" = 1),
-  "xC" = c("C" = 3, "H" = 10, "N" = 2, "S" = 1)
+  "xC" = c("C" = 3, "H" = 10, "N" = 2, "S" = 1),
+  "Arg" = c("C" = 5, "H" = 12, "N" = 3,"O" = 1),
+  "W" = c("C" = 10, "H" = 11, "N" = 2)
   )
 
 # Intact Amino Acid ions: AA +1Hydrogen (+H)

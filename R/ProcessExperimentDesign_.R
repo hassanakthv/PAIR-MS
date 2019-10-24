@@ -3,28 +3,27 @@ processExperimentDesign_ <- function (file = "experimentDesign.csv", ioi = list(
 {
   library(isoms)
   args_ <- commandArgs(trailingOnly = TRUE)
-  if (length(args_) > 0) {
-    expDesignFile <- args_[[1]]
-    if (!file.exists(expDesignFile)) {
-      if (file.exists(file)) {
-        warning(sprintf("File [%s] doesn't exist, using [%s] instead", 
-                        expDesignFile, file))
-        expDesignFile <- file
+    if(length(args_)>0){
+      expDesignFile <- args_[[1]]
+      if (!file.exists(expDesignFile)){
+        if(file.exists(file)){
+          warning(sprintf("File [%s] doesn't exist, using [%s] instead", expDesignFile, file))
+          expDesignFile <- file
+        } else {
+          message("You must provide corrent experimentDesign file location")
+          return(0)
+        }
       }
-      else {
+    } else{
+      if(file.exists(file))
+        expDesignFile <- file
+      else{
         message("You must provide corrent experimentDesign file location")
         return(0)
       }
     }
-  }
-  else {
-    if (file.exists(file)) 
-      expDesignFile <- file
-    else {
-      message("You must provide corrent experimentDesign file location")
-      return(0)
-    }
-  }
+          
+          
   expDesign <- suppressMessages(read_csv(expDesignFile))
   message("Samples to analyze: ", toString(unique(expDesign$Sample)))
   message("Number of controls: ", nrow(expDesign %>% filter(Sample == 

@@ -89,18 +89,9 @@ Summarizefile <- function(data = NA,
   }    
   
   data <- hh
-  ranges <- data %>%
-    group_by(file, peak, ion) %>%
-    summarise(meanerror = mean(masserror),
-              medianerror = median(masserror),
-              meansq = mean(masserror^2),
-              gg = median(isoratio/n, na.rm = T),
-              ir = median(isoratio, na.rm = T),
-              md = mad(isoratio/n, na.rm = T),
-              nhits = n(), mmin = gg - 3 * md, mmax = gg + 3 * md)
-  
+    
   rranges <- ranges %>%
-    filter(nhits > 10 & gg > 0) %>%
+    filter(nhits >= 2 & gg > 0) %>%
     summarize(mgg = median(gg, na.rm = T),
               madgg = mad(gg, na.rm = T),
               mmd = min(md))

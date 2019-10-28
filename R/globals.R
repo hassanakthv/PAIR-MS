@@ -34,7 +34,7 @@ immoniumIons = list(
   "FM1" = c("C" = 2, "H" = 5, "S"= 1),
   "FM2" = c("C" = 5, "H" = 9, "O" = 2, "S" = 1),
   "FM3" = c("C" = 4, "H" = 7, "S" = 1),
-  "FM4" = c("C" = 4, "H" = 8, "N" = 1,"O" = 2),  
+  "FM4" = c("C" = 4, "H" = 8, "N" = 1,"O" = 2)  
   )
 
 # Intact Amino Acid ions: AA +1Hydrogen (+H)

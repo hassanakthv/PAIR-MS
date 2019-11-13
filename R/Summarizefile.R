@@ -32,7 +32,7 @@ Summarizefile <- function(data = NA,
     if (!dir.exists(resultPath))
         dir.create(resultPath, recursive = TRUE)
 
-    mass_tol <- 8e-04
+    mass_tol <- 3e-04
     if (!("file" %in% names(data))) {
         data <- data %>% mutate(file = "file")
     }

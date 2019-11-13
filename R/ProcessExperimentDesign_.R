@@ -42,6 +42,6 @@ processExperimentDesign_ <- function (file = "experimentDesign.csv", ioi = list(
                                                                                                                    (xx$Start * 60) & (rt < xx$End * 60))
   }) %>% ungroup() %>% mutate(I0 = I/isoratio) %>% mutate(dI = I0/tic, 
                                                           ldI = log10(dI)) %>% mutate(ltic = log10(tic))
-  HSummarize_Imm(data = data_, group = "group", resultPath = outdir, 
+  Summarizefile(data = data_, group = "group", resultPath = outdir, 
                      correct = correct, IOI = ioi, Info = expDesign[1, 10:ncol(expDesign)], IOI_ = ioi_)
 }

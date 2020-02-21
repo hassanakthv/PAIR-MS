@@ -80,7 +80,7 @@ Summarizefile <- function(data = NA,
       for(k in hp){
         
         ref <- ranges %>% filter(file == i & ion == j & peak ==k)
-        hh_ <- htemp_ %>% filter(peak == k) %>% filter(peak == "0" | g_ > ref$mmin & g_<ref$mmax & R2 >0.9)
+        hh_ <- htemp_ %>% filter(peak == k) %>% filter(peak == "0" | g_ > ref$mmin & g_<ref$mmax)
         
         hh <-rbind(hh,hh_) 
         

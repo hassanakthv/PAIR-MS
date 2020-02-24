@@ -200,8 +200,7 @@ aa_data %>%
   theme_bw() +
   theme(legend.position = "")+ 
   ylab(bquote(''^13*'C'/''^12*'C')) + xlab("") -> g_violin
-aa_data %>% 
-  filter(ion=='any') %>% 
+aa_data %>%  
   ggplot(aes(x=gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
   theme_bw() +
   theme(legend.position = "")+ 
@@ -435,8 +434,7 @@ aa_data %>%
   theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
   ylab(bquote(''^15*'N'/''^14*'N')) + xlab("") +
     facet_wrap(~ion) -> g_bp
-aa_data %>% 
-  filter(ion=='any') %>% 
+aa_data %>%  
   ggplot(aes(x=gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
   theme_bw() +
   theme(legend.position = "")+ 
@@ -665,7 +663,6 @@ aa_data %>%
   ylab(bquote(''^2*'H'/''^1*'H')) + xlab("") +
   facet_wrap(~ion) -> g_bp
 aa_data %>% 
-  filter(ion=='any') %>% 
   ggplot(aes(x=gamma, fill=group, group=file)) + geom_density(alpha=0.3)  +
   theme_bw() +
   theme(legend.position = "")+ 
@@ -887,7 +884,6 @@ aa_data %>%
     ylab(bquote(''^18*'O'/''^16*'O')) + xlab("") +
     facet_wrap(~ion) -> g_bp
   aa_data %>% 
-    filter(ion=='any') %>% 
     ggplot(aes(x=gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
     theme_bw() +
     theme(legend.position = "")+ 

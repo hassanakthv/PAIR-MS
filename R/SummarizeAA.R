@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-Summarizefile <- function(data = NA,
+SummarizeAA <- function(data = NA,
                                files = NA,
                                group = ifelse(is.na(data),
                                               "file",
@@ -239,7 +239,7 @@ Summarizefile <- function(data = NA,
   gg <- all_aa %>% distinct(group)
   message("Rendering HTML report: ")
   resultPath <- normalizePath(resultPath)
-  rmarkdown::render(system.file("Rmd/isoMS_report.Rmd", package = getPackageName()),
+  rmarkdown::render(system.file("Rmd/AAisoMS_Report.Rmd", package = getPackageName()),
                     envir = sys.frame(sys.nframe()), output_file = file.path(resultPath, "isoMS_report.html"))
   rmarkdown::render(system.file("Rmd/isoMS_loess.Rmd", package = getPackageName()),
                     envir = sys.frame(sys.nframe()), output_file = file.path(resultPath, "isoMS_loess.html"))

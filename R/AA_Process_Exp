@@ -1,4 +1,4 @@
-ProcessExp_AA <- function (file = "experimentDesign.csv", ioi = list(iointrest), ioi_ = list(iontoshow),
+processExp_AA <- function (file = "experimentDesign.csv", ioi = list(iointrest), ioi_ = list(iontoshow),
           correct = TRUE) 
 {
   library(isoms)

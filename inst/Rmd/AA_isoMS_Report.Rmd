@@ -188,8 +188,20 @@ aa_data %>%
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('ln(AUC), a.u.') +
     ylab(bquote(''^13*'C'/''^12*'C')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log(TIC), a.u.') +
+    ylab(bquote(''^13*'C'/''^12*'C')) -> g_logTIC
+    
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
+  filter(gamma>vmin & gamma<vmax) %>%
   ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot(position='dodge', outlier.color = NA, notch=T)  +
   theme_bw() +
   theme(axis.text.x=element_text(angle = 90, hjust = 1))+ 
@@ -227,6 +239,7 @@ aa_data %>%
 
 print(g_rt)
 print(g_logI)
+print(g_logTIC)
 print(g_bp)
 print(g_density)
 print(g_tic)
@@ -426,6 +439,18 @@ aa_data %>%
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('ln(AUC), a.u.') + scale_x_log10()+
     ylab(bquote(''^15*'N'/''^14*'N')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log(TIC), a.u.') +
+    ylab(bquote(''^13*'C'/''^12*'C')) -> g_logTIC
+    
+    
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   filter(gamma>vmin & gamma<vmax) %>% 
@@ -459,6 +484,7 @@ aa_data %>%
 
 print(g_rt)
 print(g_logI)
+print(g_logTIC)
 print(g_bp)
 print(g_density)
 print(g_tic)
@@ -655,8 +681,20 @@ aa_data %>%
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('ln(AUC), a.u.') + scale_x_log10() +
     ylab(bquote(''^2*'H'/''^1*'H')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log(TIC), a.u.') +
+    ylab(bquote(''^13*'C'/''^12*'C')) -> g_logTIC
+    
 aa_data %>% 
   filter(ion %in% ion_plot) %>%
+  filter(gamma>vmin & gamma<vmax) %>%
   ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
   theme_bw() +
   theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
@@ -687,6 +725,7 @@ aa_data %>%
 
 print(g_rt)
 print(g_logI)
+print(g_logTIC)
 print(g_bp)
 print(g_density)
 print(g_tic)
@@ -877,6 +916,17 @@ aa_data %>%
       theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
       xlab('ln(AUC), a.u.') + scale_x_log10() +
       ylab(bquote(''^18*'O'/''^16*'O')) -> g_logI
+      
+  aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log(TIC), a.u.') +
+    ylab(bquote(''^13*'C'/''^12*'C')) -> g_logTIC
+    
   aa_data %>% 
     ggplot(aes(x=file, y=gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
     theme_bw() +
@@ -907,6 +957,7 @@ aa_data %>%
   
   print(g_rt)
   print(g_logI)
+  print(g_logTIC)
   print(g_bp)
   print(g_density)
   print(g_tic)

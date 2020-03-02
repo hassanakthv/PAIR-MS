@@ -116,7 +116,7 @@ SummarizeAA <- function(data = NA,
   
   data_ldI %>%
     filter(peak != '0') %>%
-    group_by(peak, ion , file) %>%
+    group_by(peak, ion) %>%
     do({
       dd <- .
       peak <- dd$peak[[1]]
@@ -128,7 +128,7 @@ SummarizeAA <- function(data = NA,
     }) %>% filter(term=='ldI') -> ldI_model
   
   data_ldI <- data_ldI %>%
-    left_join(ldI_model, by=c('peak', 'ion', 'file')) %>%
+    left_join(ldI_model, by=c('peak', 'ion')) %>%
     mutate(gg=gg-ldI*estimate)
   
   if(correct){

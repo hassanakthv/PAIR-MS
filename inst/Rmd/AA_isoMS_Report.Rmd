@@ -449,7 +449,7 @@ aa_data %>%
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
-    lab(expression(paste("TIC, ",Log[10],sep = ""))) +
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
     ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_logTIC
     
     

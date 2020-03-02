@@ -91,7 +91,7 @@ SummarizeAA <- function(data = NA,
   data <- hh
     
   rranges <- ranges %>%
-    filter(nhits >= 2 & gg > 0) %>%
+    filter(nhits >= 10 & gg > 0) %>%
     summarize(mgg = median(gg, na.rm = T),
               madgg = mad(gg, na.rm = T),
               mmd = min(md))
@@ -116,7 +116,7 @@ SummarizeAA <- function(data = NA,
   
   data_ldI %>%
     filter(peak != '0') %>%
-    group_by(peak, ion) %>%
+    group_by(peak, ion , file) %>%
     do({
       dd <- .
       peak <- dd$peak[[1]]
@@ -128,7 +128,7 @@ SummarizeAA <- function(data = NA,
     }) %>% filter(term=='ldI') -> ldI_model
   
   data_ldI <- data_ldI %>%
-    left_join(ldI_model, by=c('peak', 'ion')) %>%
+    left_join(ldI_model, by=c('peak', 'ion', 'file')) %>%
     mutate(gg=gg-ldI*estimate)
   
   if(correct){

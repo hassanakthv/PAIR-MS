@@ -240,7 +240,7 @@ SummarizeAA <- function(data = NA,
   message("Rendering HTML report: ")
   resultPath <- normalizePath(resultPath)
   rmarkdown::render(system.file("Rmd/AA_isoMS_Report.Rmd", package = getPackageName()),
-                    envir = sys.frame(sys.nframe()), output_file = file.path(resultPath, paste(info$OutputName,".html", sep = "")))
+                    envir = sys.frame(sys.nframe()), output_file = file.path(resultPath, paste(Info$OutputName,".html", sep = "")))
   rmarkdown::render(system.file("Rmd/isoMS_loess.Rmd", package = getPackageName()),
                     envir = sys.frame(sys.nframe()), output_file = file.path(resultPath, "isoMS_loess.html"))
 }

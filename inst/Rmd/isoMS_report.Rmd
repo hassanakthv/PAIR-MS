@@ -66,6 +66,8 @@ info <- Info
 
 ## Experiment Information
 
+**File:** *`r info$OutputName`*
+
 **Description:** *`r info$Description`*      
 
 **Aims:** *`r info$Aim`*     

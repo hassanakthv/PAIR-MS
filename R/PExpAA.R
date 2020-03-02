@@ -40,7 +40,7 @@ PExpAA <- function (file = "experimentDesign.csv", ioi = list(iointrest), ioi_ =
     fd %>% mutate(I = abs(I), sigma = abs(sigma)) %>% mutate(file = xx$File, 
                                                              group = xx$Sample, loading = xx$Loading) %>% filter(rt > 
                                                                                                                    (xx$Start * 60) & (rt < xx$End * 60))
-  }) %>% ungroup() %>% mutate(I0 = I/isoratio) %>% mutate(dI = I0/tic, 
+  }) %>% ungroup() %>% mutate(I0 = I/isoratio) %>% mutate(dI = I/tic, 
                                                           ldI = log10(dI)) %>% mutate(ltic = log10(tic)) %>%
                                                           filter(group==ion)
   SummarizeAA(data = data_, group = "group", resultPath = outdir, 

@@ -138,6 +138,26 @@ SummarizeAA <- function(data = NA,
     data <- data %>% mutate(gamma = isoratio/n)
   }
   
+  hres <- data.frame()
+
+for (i in unique(data$ion)){
+  
+  for (p in unique(data$peak)){
+    
+    dd <- data %>% filter(ion == i & peak == p)
+    if (nrow(dd)>1){
+    y <- as.matrix(dd$gamma)
+    batch <- c(dd$file)
+    
+    y2 <- removeBatchEffect(t(y), batch)
+    dd <- dd %>% mutate(gamma = t(y2))
+    hres <- bind_rows(hres, dd)
+    }else(next)
+    }
+
+}
+  data <- hres
+  
   if (file.exists(file.path(resultPath, "all_aa.RData"))) {
     message("all_aa.RData file exists, will not recalculate it.")
     load(file.path(resultPath, "all_aa.RData"))

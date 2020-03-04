@@ -122,9 +122,9 @@ SummarizeAA <- function(data = NA,
       peak <- dd$peak[[1]]
       ion <- dd$ion[[1]]
       if(length(unique(dd$group))>1){
-        tidy(lm(gg~ldI+group, data=.))
+        tidy(lm(gg~ldI + group + 0, data=.))
       } else
-        tidy(lm(gg~ldI, data=.))
+        tidy(lm(gg~ldI + 0, data=.))
     }) %>% filter(term=='ldI') -> ldI_model
   
   data_ldI <- data_ldI %>%

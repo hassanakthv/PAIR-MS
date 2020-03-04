@@ -150,27 +150,22 @@ aa_data$ion <- factor(
               arrange(md, desc(n)))$ion)
 
 aa_data <- aa_data %>% 
-  group_by(group, ion) %>%
+  group_by(group, file, ion) %>%
   mutate(ldI = ldI-median(ldI)) %>% ungroup()
 
 aa_data %>% 
-  group_by(group, ion) %>%
+  group_by(group, ion , file) %>%
   do({
     dd_ <- .
-    broom::tidy(lm(gamma~ldI, data=dd_))
-  }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
+    broom::tidy(lm(gamma~ldI + 0, data=dd_))
+  }) %>% filter(term=='ldI') %>% select(group, ion, file,  estimate) -> ldI_models
 
 aa_data <- aa_data %>% 
-  left_join(ldI_models, by=c('group','ion')) %>% 
+  left_join(ldI_models, by=c('group','ion', 'file')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-Pro <- which(levels(aa_data$ion)=="P")
-Leu <- which(levels(aa_data$ion)=="L")
-any <- which(levels(aa_data$ion)=="any")
-Hyp <- which(levels(aa_data$ion)=="Hyp")
-
-ion_plot_ <- levels(aa_data$ion)[1:4]
 ion_plot <- IOI_
+
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
   ggplot(aes(x=rt/60, y=100*gamma, group=file, color=group)) + 
@@ -180,6 +175,11 @@ aa_data %>%
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('RT, min') +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_rt
+    
+    
+sm <- cor(x = aa_data$logI, y= aa_data$gamma , method = "pearson")
+ll <- summary(lm(c(100*aa_data$gamma)~ aa_data$logI, method = "qr"))
+eqn <- paste(paste("y = ", round(ll$coefficients[2],3), "*x", round(ll$coefficients[1],5), " ,R2 = ", round(ll$r.squared,3) ,sep = ""),paste("Correlation = ", round(sm,3), sep = ""), sep = '\n')
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
@@ -189,6 +189,8 @@ aa_data %>%
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('log2(AUC), a.u.') +
+    annotate(geom="text", x=10, y=100*max(aa_data$gamma), label=eqn,
+               color="red") +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logI
     
 aa_data %>%

@@ -406,7 +406,7 @@ aa_data %>%
   group_by(group, ion) %>%
   do({
     dd_ <- .
-    broom::tidy(lm(gamma~ldI, data=dd_))
+    broom::tidy(lm(gamma~ldI + 0, data=dd_))
   }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
 
 aa_data <- aa_data %>% 
@@ -427,7 +427,7 @@ aa_data %>%
     
     
 sm <- cor(x = aa_data$logI, y= aa_data$gamma , method = "pearson")
-ll <- summary(lm(c(100*a_data$gamma)~ aa_data$logI, method = "qr"))
+ll <- summary(lm(c(100*aa_data$gamma)~ aa_data$logI, method = "qr"))
 eqn <- paste(paste("y = ", round(ll$coefficients[2],3), "*x", round(ll$coefficients[1],5), " ,R2 = ", round(ll$r.squared,3) ,sep = ""),paste("Correlation = ", round(sm,3), sep = ""), sep = '\n')
 
 aa_data %>% 

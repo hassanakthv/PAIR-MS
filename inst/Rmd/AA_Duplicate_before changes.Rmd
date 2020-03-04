@@ -1,0 +1,1194 @@
+---
+title: "isoMS analysis report"
+author: "Alexey L. Chernobrovkin & Hassan Gharibi"
+#date: "6/29/2017"
+output: 
+  html_document:
+    theme: simplex
+    fig_retina: true
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(isoms)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(broom)
+library(gridExtra)
+library(DT)
+require(knitr)
+```
+
+<!--
+## Linear model summaries {.tabset}
+### LM file summary
+```{r, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+lm_res %>% 
+  filter(term=='I0') %>% 
+  select(peak, group, file, estimate, std.error) %>% 
+  arrange(peak, group, file) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                    dom = 'Bfrtip',
+                                    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))) %>%
+  formatSignif('estimate', 6) %>%  formatSignif(c('std.error'), 1)
+```
+### LM group summary
+```{r, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+lm_res %>% 
+  filter(term=='I0') %>% 
+  select(peak, group, file, estimate, std.error) %>% 
+  group_by(peak, group) %>% 
+  summarise(mean=mean(estimate), sd=sd(estimate), n=n()) %>% 
+  mutate(cv = sd/mean/sqrt(n)*100) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                    dom = 'Bfrtip',
+                                    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))) %>%
+  formatSignif(c('mean','sd'), 6) %>%  formatSignif(c('cv'), 2)
+```
+-->
+
+```{r Experiment_info, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12, fig.height=12}
+info <- Info
+```
+
+
+## Experiment Information
+
+**File:** *`r info$OutputName`*
+
+**Description:** *`r info$Description`*      
+
+**Aims:** *`r info$Aim`*     
+
+**Samples List:** *`r info$Samples`*   
+
+**Number of Samples:** *`r info$No.Sample`*   
+
+**Controls List:** *`r info$Controls`*   
+
+**Number of Controls:** *`r info$No.Controls`*   
+
+**Number of Replicates:** *`r info$Replicates`*
+
+**Analysis Duration:** *`r info$Duration`* min     
+
+**Method:** *`r info$Method`*     
+
+**LC-Gradient:** *`r info$LC.Gradient`*     
+     
+**MS1 Scans:** *`r info$MS1`*
+
+**MS2 Scans:** *`r info$MS2`*
+
+**Instrument:** *`r info$Instrument`*
+
+**Exprimenter:** *`r info$Experimenter`*     
+
+**Date:** *`r info$Date`*    
+
+**Other:** *`r info$Other`*
+
+
+
+## Aminoacid composition
+
+```{r aa_comp, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12, fig.height=12}
+all_aa %>% 
+  filter(peak=="13C" & ion != 'any') %>% 
+  group_by(group, ion) %>% 
+  summarize(abundance=sum(I0, na.rm=T)) %>% 
+  mutate(abundance = abundance/sum(abundance)*100) -> aa_abundances
+aa_abundances$ion <- factor(aa_abundances$ion, 
+                            levels=aa_abundances %>% 
+                              group_by(ion) %>% 
+                              summarize(s=sum(abundance)) %>% 
+                              arrange(desc(s)) %>% 
+                              select(ion) %>% unlist())
+aa_abundances %>% 
+  ggplot(aes(x=ion, y=abundance, fill=group)) + geom_col(position='dodge') + 
+  theme_bw() + ylab("Abundance, %") + xlab("AA")
+```
+
+## Carbon: $$^{13}C/^{12}C$$ {.tabset}
+
+### Data overview
+
+```{r 13C, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12, fig.height=12}
+vals <- (all_aa %>% filter(peak=='13C'))$gamma
+vmin <- quantile(vals, 0.02)
+vmax <- quantile(vals, 0.98)
+all_aa %>% 
+  filter(peak=='13C') %>% 
+  group_by(ion,file) %>% 
+  summarize(m = median(gamma), md = mad(gamma)) -> mmad
+nf <- length(unique(all_aa$file))
+aa_data <- all_aa %>%
+  filter(peak=='13C') %>% 
+  left_join(mmad, by=c('ion','file')) %>% 
+  filter(md > 0) %>% 
+  filter(gamma>(m-3*md) & gamma < (m+3*md))
+aa_data$ion <- factor(
+  aa_data$ion, 
+  levels = (mmad %>% 
+              summarise(n=n(),md=mean(md)) %>%
+              mutate(sortby = ifelse((md>0 & n==nf), md, 1e5)) %>% 
+              arrange(md, desc(n)))$ion)
+aa_data <- aa_data %>% 
+  group_by(group, ion) %>%
+  mutate(ldI = ldI-median(ldI)) %>% ungroup()
+aa_data %>% 
+  group_by(group, ion) %>%
+  do({
+    dd_ <- .
+    broom::tidy(lm(gamma~ldI, data=dd_))
+  }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
+aa_data <- aa_data %>% 
+  left_join(ldI_models, by=c('group','ion')) %>% 
+  mutate(gamma=gamma - ldI*estimate)
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=rt/60, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('RT, min') +
+    ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_rt
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=logI, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log2(AUC), a.u.') +
+    ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
+    ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logTIC
+    
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  filter(gamma>vmin & gamma<vmax) %>%
+  ggplot(aes(x=file, y=100*gamma, fill=group)) + geom_boxplot(position='dodge', outlier.color = NA, notch=T)  +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle = 90, hjust = 1))+ 
+  ylab(bquote(''^13*'C'/''^12*'C, (%)')) + xlab("") +
+  facet_wrap(~ion) -> g_bp
+aa_data %>% 
+  ggplot(aes(x=ion, y=100*gamma, fill=file)) + geom_violin( outlier.color = NA, draw_quantiles = c(0.25, 0.5, 0.75))  +
+  theme_bw() +
+  theme(legend.position = "")+ 
+  ylab(bquote(''^13*'C'/''^12*'C, (%)')) + xlab("") -> g_violin
+aa_data %>%  
+  ggplot(aes(x=100*gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
+  theme_bw() +
+  theme(legend.position = "")+ 
+  xlab(bquote(''^13*'C'/''^12*'C, (%)')) + ylab("density") -> g_density
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic),na.rm=T)) %>% 
+  arrange(tic) %>% 
+  ggplot(aes(x=tic, y=mean,  color=group)) +
+    geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
+    theme_bw() + facet_grid(.~ion, scales='free') + ylab(bquote('Mean '^13*'C'/''^12*'C, (%)')) + theme(axis.text.x=element_text(angle = 90, hjust = 1)) + xlab(expression(paste("TIC, ",Log[10],sep = ""))) -> g_tic
+#grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
+print(g_rt)
+print(g_logI)
+print(g_logTIC)
+print(g_bp)
+print(g_density)
+print(g_tic)
+```
+
+
+### File summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+aa_data %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic), na.rm=T)) %>% 
+  arrange(ion) -> res_group
+res_group %>% 
+  ungroup() %>% 
+  arrange(ion, group, file) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  )) %>%
+  formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se','tic'), 2) %>%
+  formatStyle(
+    'mean',
+    background = styleColorBar(res_group$mean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'median',
+    background = styleColorBar(res_group$median, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'wmean',
+    background = styleColorBar(res_group$wmean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+res_group -> fileres_C
+# tlist <- list()
+# for(aa in unique(res_group$ion)){
+#   tt <- res_group %>% 
+#     filter(ion==aa)
+#   
+#   tlist[[aa]] <- tt %>% 
+#     datatable(extensions = 'Buttons', options = list(
+#                                         dom = 'Bfrtip',
+#                                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+#     )) %>%  
+#     formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se'), 1) %>%
+#     formatStyle(
+#       'mean',
+#       background = styleColorBar(tt$mean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'median',
+#       background = styleColorBar(tt$median, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'wmean',
+#       background = styleColorBar(tt$wmean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     )
+# }
+# htmltools::tagList(tlist)
+```
+
+
+### Group summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+res_group %>%
+  summarize(gmean=mean(mean), gmedian=mean(median), gwmean=mean(wmean), sd_mean=sd(mean), sd_median=sd(median), sd_wmean=sd(wmean), n=n()) %>%
+  mutate(
+    cv_mean = sd_mean/gmean/sqrt(n)*100,
+    cv_median = sd_median/gmedian/sqrt(n)*100,
+    cv_wmean = sd_wmean/gwmean/sqrt(n)*100
+  ) -> res
+res %>% 
+    datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>%  
+    formatSignif(c('gmean','gmedian','gwmean','sd_mean','sd_median','sd_wmean'), 6) %>%
+    formatSignif(c('cv_mean','cv_median','cv_wmean'), 2) %>%
+    formatStyle(
+      'gmean',
+      background = styleColorBar(res$gmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gmedian',
+      background = styleColorBar(res$gmedian, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gwmean',
+      background = styleColorBar(res$gwmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    )
+```
+
+
+
+
+
+
+## Nitrogen: $$^{15}N/^{14}N$$ {.tabset}
+
+### Data overview
+```{r 15N, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+vals <- (all_aa %>% filter(peak=='15N'))$gamma
+vmin <- quantile(vals, 0.05)
+vmax <- quantile(vals, 0.95)
+all_aa %>% 
+  filter(peak=='15N') %>% 
+  group_by(ion, file) %>% 
+  summarize(m = median(gamma), md = mad(gamma)) -> mmad
+aa_data <- all_aa %>%
+  filter(peak=='15N') %>% 
+  left_join(mmad, by=c('ion','file')) %>% 
+  filter(md > 0) %>% 
+  filter(gamma>(m-3*md) & gamma < (m+3*md))
+aa_data$ion <- factor(
+  aa_data$ion, 
+  levels = (mmad %>% 
+              summarise(n=n(),md=mean(md)) %>%
+              mutate(sortby = ifelse((md>0 & n==nf), md, 1e5)) %>% 
+              arrange(md, desc(n)))$ion)
+aa_data <- aa_data %>% 
+  group_by(group, ion) %>%
+  mutate(ldI = ldI-median(ldI)) %>% ungroup()
+aa_data %>% 
+  group_by(group, ion) %>%
+  do({
+    dd_ <- .
+    broom::tidy(lm(gamma~ldI, data=dd_))
+  }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
+aa_data <- aa_data %>% 
+  left_join(ldI_models, by=c('group','ion')) %>% 
+  mutate(gamma=gamma - ldI*estimate)
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=rt/60, y=100*gamma, group=file,color=group)) + 
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('RT, min') +
+    ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_rt
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=logI, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log2(AUC), a.u.') + scale_x_log10()+
+    ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
+    ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_logTIC
+    
+    
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  filter(gamma>vmin & gamma<vmax) %>% 
+  ggplot(aes(x=file, y=100*gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
+  theme_bw() +
+  theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+  ylab(bquote(''^15*'N'/''^14*'N, (%)')) + xlab("") +
+    facet_wrap(~ion) -> g_bp
+aa_data %>%  
+  ggplot(aes(x=100*gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
+  theme_bw() +
+  theme(legend.position = "")+ 
+  xlab(bquote(''^15*'N'/''^14*'N, (%)')) + ylab("density") -> g_density
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic),na.rm=T)) %>% 
+  arrange(tic) %>% 
+  ggplot(aes(x=tic, y=mean,  color=group)) +
+    geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
+    theme_bw() + facet_grid(.~ion, scales='free') + theme(axis.text.x=element_text(angle = 90, hjust = 1)) +ylab(bquote('Mean '^15*'N'/''^14*'N, (%)')) + xlab(expression(paste("TIC, ",Log[10],sep = ""))) -> g_tic
+#grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
+print(g_rt)
+print(g_logI)
+print(g_logTIC)
+print(g_bp)
+print(g_density)
+print(g_tic)
+```
+
+
+### File summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+aa_data %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic), na.rm=T)) %>% 
+  arrange(ion) -> res_group
+res_group %>% 
+  ungroup() %>% 
+  arrange(ion, group, file) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  )) %>%
+  formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se','tic'), 2) %>%
+  formatStyle(
+    'mean',
+    background = styleColorBar(res_group$mean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'median',
+    background = styleColorBar(res_group$median, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'wmean',
+    background = styleColorBar(res_group$wmean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+res_group -> fileres_N
+# tlist <- list()
+# for(aa in unique(res_group$ion)){
+#   tt <- res_group %>% 
+#     filter(ion==aa)
+#   
+#   tlist[[aa]] <- tt %>% 
+#     datatable(extensions = 'Buttons', options = list(
+#                                         dom = 'Bfrtip',
+#                                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+#     )) %>%  
+#     formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se'), 1) %>%
+#     formatStyle(
+#       'mean',
+#       background = styleColorBar(tt$mean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'median',
+#       background = styleColorBar(tt$median, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'wmean',
+#       background = styleColorBar(tt$wmean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     )
+# }
+# htmltools::tagList(tlist)
+```
+
+### Group summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+res_group %>%
+  summarize(gmean=mean(mean), gmedian=mean(median), gwmean=mean(wmean), sd_mean=sd(mean), sd_median=sd(median), sd_wmean=sd(wmean), n=n()) %>%
+  mutate(
+    cv_mean = sd_mean/gmean/sqrt(n)*100,
+    cv_median = sd_median/gmedian/sqrt(n)*100,
+    cv_wmean = sd_wmean/gwmean/sqrt(n)*100
+  ) -> res
+res %>% 
+    datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>%  
+    formatSignif(c('gmean','gmedian','gwmean','sd_mean','sd_median','sd_wmean'), 6) %>%
+    formatSignif(c('cv_mean','cv_median','cv_wmean'), 2) %>%
+    formatStyle(
+      'gmean',
+      background = styleColorBar(res$gmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gmedian',
+      background = styleColorBar(res$gmedian, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gwmean',
+      background = styleColorBar(res$gwmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    )
+```
+
+
+
+## Hydrogen: $$^{2}H/^{1}H$$ {.tabset}
+
+### Data overview
+```{r 2H, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+vals <- (all_aa %>% filter(peak=='2H'))$gamma
+vmin <- quantile(vals, 0.05)
+vmax <- quantile(vals, 0.95)
+all_aa %>% 
+  filter(peak=='2H') %>% 
+  group_by(ion,file) %>% 
+  summarize(m = median(gamma), md = mad(gamma)) -> mmad
+aa_data <- all_aa %>%
+  filter(peak=='2H') %>% 
+  left_join(mmad, by=c('ion','file')) %>% 
+  filter(md > 0) %>% 
+  filter(gamma>(m-3*md) & gamma < (m+3*md))
+aa_data$ion <- factor(
+  aa_data$ion, 
+  levels = (mmad %>% 
+              summarise(n=n(),md=mean(md)) %>%
+              mutate(sortby = ifelse((md>0 & n==nf), md, 1e5)) %>% 
+              arrange(md, desc(n)))$ion)
+aa_data <- aa_data %>% 
+  group_by(group, ion) %>%
+  mutate(ldI = ldI-median(ldI)) %>% ungroup()
+aa_data %>% 
+  group_by(group, ion) %>%
+  do({
+    dd_ <- .
+    broom::tidy(lm(gamma~ldI, data=dd_))
+  }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
+aa_data <- aa_data %>% 
+  left_join(ldI_models, by=c('group','ion')) %>% 
+  mutate(gamma=gamma - ldI*estimate)
+Pro <- which(levels(aa_data$ion)=="P")
+Leu <- which(levels(aa_data$ion)=="L")
+any <- which(levels(aa_data$ion)=="any")
+Hyp <- which(levels(aa_data$ion)=="Hyp")
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=rt/60, y=1e6*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('RT, min') +
+    ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_rt
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=logI, y=1e6*gamma, color=group, group=file)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(ion~.) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log2(AUC), a.u.') + scale_x_log10() +
+    ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_logI
+    
+aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=1e6*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
+    ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_logTIC
+    
+aa_data %>% 
+  filter(ion %in% ion_plot) %>%
+  filter(gamma>vmin & gamma<vmax) %>%
+  ggplot(aes(x=file, y=1e6*gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
+  theme_bw() +
+  theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+  ylab(bquote(''^2*'H'/''^1*'H, ppm')) + xlab("") +
+  facet_wrap(~ion) -> g_bp
+aa_data %>% 
+  ggplot(aes(x=1e6*gamma, fill=group, group=file)) + geom_density(alpha=0.3)  +
+  theme_bw() +
+  theme(legend.position = "")+ 
+  xlab(bquote(''^2*'H'/''^1*'H, ppm')) + ylab("density") -> g_density
+aa_data %>% 
+  filter(ion %in% ion_plot) %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic),na.rm=T)) %>% 
+  arrange(tic) %>% 
+  ggplot(aes(x=tic, y=mean,  color=group)) +
+    geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
+    theme_bw() + facet_grid(.~ion, scales='free') + theme(axis.text.x=element_text(angle = 90, hjust = 1)) +ylab(bquote('Mean '^2*'H'/''^1*'H, ppm')) + xlab(expression(paste("TIC, ",Log[10],sep = ""))) -> g_tic
+#grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
+print(g_rt)
+print(g_logI)
+print(g_logTIC)
+print(g_bp)
+print(g_density)
+print(g_tic)
+```
+
+
+### File summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+aa_data %>% 
+  group_by(ion, group,file) %>% 
+  summarize(
+    mean=mean(gamma)*100, 
+    median=median(gamma)*100, 
+    wmean = weighted.mean(gamma, logI)*100, 
+    sd = sd(gamma)*100, 
+    se = sd(gamma)/sqrt(n())*100, 
+    n=n(), 
+    tic=median(log10(tic), na.rm=T)) %>% 
+  arrange(ion) -> res_group
+res_group %>% 
+  ungroup() %>% 
+  arrange(ion, group, file) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  )) %>%
+  formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se','tic'), 2) %>%
+  formatStyle(
+    'mean',
+    background = styleColorBar(res_group$mean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'median',
+    background = styleColorBar(res_group$median, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  ) %>%
+  formatStyle(
+    'wmean',
+    background = styleColorBar(res_group$wmean, 'azure'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+res_group -> fileres_H
+# tlist <- list()
+# for(aa in unique(res_group$ion)){
+#   tt <- res_group %>% 
+#     filter(ion==aa)
+#   
+#   tlist[[aa]] <- tt %>% 
+#     datatable(extensions = 'Buttons', options = list(
+#                                         dom = 'Bfrtip',
+#                                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+#     )) %>%  
+#     formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se'), 1) %>%
+#     formatStyle(
+#       'mean',
+#       background = styleColorBar(tt$mean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'median',
+#       background = styleColorBar(tt$median, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     ) %>%
+#     formatStyle(
+#       'wmean',
+#       background = styleColorBar(tt$wmean, 'azure'),
+#       backgroundSize = '100% 90%',
+#       backgroundRepeat = 'no-repeat',
+#       backgroundPosition = 'center'
+#     )
+# }
+# htmltools::tagList(tlist)
+```
+
+### Group summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+res_group %>%
+  summarize(gmean=mean(mean), gmedian=mean(median), gwmean=mean(wmean), sd_mean=sd(mean), sd_median=sd(median), sd_wmean=sd(wmean), n=n()) %>%
+  mutate(
+    cv_mean = sd_mean/gmean/sqrt(n)*100,
+    cv_median = sd_median/gmedian/sqrt(n)*100,
+    cv_wmean = sd_wmean/gwmean/sqrt(n)*100
+  ) -> res
+res %>% 
+    datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>%  
+    formatSignif(c('gmean','gmedian','gwmean','sd_mean','sd_median','sd_wmean'), 6) %>%
+    formatSignif(c('cv_mean','cv_median','cv_wmean'), 2) %>%
+    formatStyle(
+      'gmean',
+      background = styleColorBar(res$gmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gmedian',
+      background = styleColorBar(res$gmedian, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'gwmean',
+      background = styleColorBar(res$gwmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    )
+```
+
+
+
+## Oxygen: $$^{18}O/^{16}O$$ {.tabset}
+
+### Data overview
+
+```{r 18O, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+vals <- (all_aa %>% filter(peak=='18O'))$gamma
+if(length(vals)>0){
+  vmin <- quantile(vals, 0.05)
+  vmax <- quantile(vals, 0.95)
+  all_aa %>% 
+    filter(peak=='18O') %>% 
+    group_by(ion,file) %>% 
+    summarize(m = median(gamma), md = mad(gamma)) -> mmad
+  aa_data <- all_aa %>%
+    filter(peak=='18O') %>% 
+    left_join(mmad, by=c('ion','file')) %>% 
+    filter(gamma>(m-3*md) & gamma < (m+3*md))
+  aa_data$ion <- factor(
+    aa_data$ion, 
+    levels = (mmad %>% 
+                summarise(n=n(),md=mean(md)) %>%
+                mutate(sortby = ifelse((md>0 & n==nf), md, 1e5)) %>% 
+                arrange(md, desc(n)))$ion)
+  
+  aa_data <- aa_data %>% 
+    group_by(group, ion) %>%
+    mutate(ldI = ldI-median(ldI)) %>% ungroup()
+  
+  aa_data %>% 
+    group_by(group, ion) %>%
+    do({
+      dd_ <- .
+      broom::tidy(lm(gamma~ldI, data=dd_))
+    }) %>% filter(term=='ldI') %>% select(group, ion, estimate) -> ldI_models
+  
+  aa_data <- aa_data %>% 
+    left_join(ldI_models, by=c('group','ion')) %>% 
+    mutate(gamma=gamma - ldI*estimate)
+  
+ion_plot_ <- levels(aa_data$ion)[1:4]
+ion_plot <- IOI_
+aa_data %>% 
+    filter(ion %in% ion_plot) %>% 
+    ggplot(aes(x=rt/60, y=100*gamma, color=group, group=file)) + 
+      geom_point(size=1, alpha=0.2) + #geom_smooth() +
+      theme_bw() + 
+      facet_grid(.~ion) + 
+      theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+      xlab('RT, min') +
+      ylab(bquote(''^18*'O'/''^16*'O, (%)')) -> g_rt
+  
+  aa_data %>% 
+    filter(ion %in% ion_plot) %>% 
+    ggplot(aes(x=logI, y=100*gamma, color=group, group=file)) + 
+      geom_point(size=1, alpha=0.2) + #geom_smooth() +
+      theme_bw() + 
+      facet_grid(ion~.) + 
+      theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+      xlab('log2(AUC), a.u.') + scale_x_log10() +
+      ylab(bquote(''^18*'O'/''^16*'O, (%)')) -> g_logI
+      
+  aa_data %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=ltic, y=100*gamma, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+    theme_bw() + 
+    facet_grid(.~ion) + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
+    ylab(bquote(''^18*'O'/''^16*'O, (%)')) -> g_logTIC
+    
+  aa_data %>% 
+    ggplot(aes(x=file, y=100*gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
+    theme_bw() +
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    ylab(bquote(''^18*'O'/''^16*'O')) + xlab("") +
+    facet_wrap(~ion) -> g_bp
+  aa_data %>% 
+    ggplot(aes(x=100*gamma, group=file, fill=group)) + geom_density(alpha=0.3)  +
+    theme_bw() +
+    theme(legend.position = "")+ 
+    xlab(bquote(''^18*'O'/''^16*'O, (%)')) + xlab("density") -> g_density
+  aa_data %>% 
+    filter(ion %in% ion_plot) %>% 
+    group_by(ion, group,file) %>% 
+    summarize(
+      mean=mean(gamma)*100, 
+      median=median(gamma)*100, 
+      wmean = weighted.mean(gamma, logI)*100, 
+      sd = sd(gamma)*100, 
+      se = sd(gamma)/sqrt(n())*100, 
+      n=n(), 
+      tic=median(log10(tic),na.rm=T)) %>% 
+    arrange(tic) %>% 
+    ggplot(aes(x=tic, y=mean,  color=group)) +
+      geom_point(size=3) + geom_smooth(method = "lm", se=F)+ geom_errorbar(aes(ymin=mean-3*se, ymax=mean+3*se),size=2)  +
+      theme_bw() + facet_grid(.~ion, scales='free') + theme(axis.text.x=element_text(angle = 90, hjust = 1)) + ylab(bquote('Mean '^18*'O'/''^16*'O ,(%)')) + xlab(expression(paste("TIC, ",Log[10],sep = "")))-> g_tic
+  #grid.arrange(g_rt, g_logI, g_bp, g_density, ncol=1)
+  
+  print(g_rt)
+  print(g_logI)
+  print(g_logTIC)
+  print(g_bp)
+  print(g_density)
+  print(g_tic)
+}
+```
+
+
+### File summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+if(length(vals)>0){
+  aa_data %>% 
+    group_by(ion, group,file) %>% 
+    summarize(
+      mean=mean(gamma)*100, 
+      median=median(gamma)*100, 
+      wmean = weighted.mean(gamma, logI)*100, 
+      sd = sd(gamma)*100, 
+      se = sd(gamma)/sqrt(n())*100, 
+      n=n(), 
+      tic=median(log10(tic), na.rm=T)) %>% 
+    arrange(ion) -> res_group
+  res_group %>% 
+    ungroup() %>% 
+    arrange(ion, group, file) %>% 
+    datatable(extensions = 'Buttons', options = list(
+                                          dom = 'Bfrtip',
+                                          buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>%
+    formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se','tic'), 2) %>%
+    formatStyle(
+      'mean',
+      background = styleColorBar(res_group$mean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'median',
+      background = styleColorBar(res_group$median, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'wmean',
+      background = styleColorBar(res_group$wmean, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    )
+  res_group -> fileres_O
+  # tlist <- list()
+  # for(aa in unique(res_group$ion)){
+  #   tt <- res_group %>% 
+  #     filter(ion==aa)
+  #   
+  #   tlist[[aa]] <- tt %>% 
+  #     datatable(extensions = 'Buttons', options = list(
+  #                                         dom = 'Bfrtip',
+  #                                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  #     )) %>%  
+  #     formatSignif(c('mean','median','wmean','sd'), 6) %>%  formatSignif(c('se'), 1) %>%
+  #     formatStyle(
+  #       'mean',
+  #       background = styleColorBar(tt$mean, 'azure'),
+  #       backgroundSize = '100% 90%',
+  #       backgroundRepeat = 'no-repeat',
+  #       backgroundPosition = 'center'
+  #     ) %>%
+  #     formatStyle(
+  #       'median',
+  #       background = styleColorBar(tt$median, 'azure'),
+  #       backgroundSize = '100% 90%',
+  #       backgroundRepeat = 'no-repeat',
+  #       backgroundPosition = 'center'
+  #     ) %>%
+  #     formatStyle(
+  #       'wmean',
+  #       background = styleColorBar(tt$wmean, 'azure'),
+  #       backgroundSize = '100% 90%',
+  #       backgroundRepeat = 'no-repeat',
+  #       backgroundPosition = 'center'
+  #     )
+  # }
+  # htmltools::tagList(tlist)
+} else {
+  fileres_O <- data.frame()
+}
+```
+
+### Group summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if(length(vals)>0){
+  res_group %>%
+    summarize(gmean=mean(mean), gmedian=mean(median), gwmean=mean(wmean), sd_mean=sd(mean), sd_median=sd(median), sd_wmean=sd(wmean), n=n()) %>%
+    mutate(
+      cv_mean = sd_mean/gmean/sqrt(n)*100,
+      cv_median = sd_median/gmedian/sqrt(n)*100,
+      cv_wmean = sd_wmean/gwmean/sqrt(n)*100
+    ) -> res
+  res %>% 
+      datatable(extensions = 'Buttons', options = list(
+                                          dom = 'Bfrtip',
+                                          buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+      )) %>%  
+      formatSignif(c('gmean','gmedian','gwmean','sd_mean','sd_median','sd_wmean'), 6) %>%
+      formatSignif(c('cv_mean','cv_median','cv_wmean'), 2) %>%
+      formatStyle(
+        'gmean',
+        background = styleColorBar(res$gmean, 'azure'),
+        backgroundSize = '100% 90%',
+        backgroundRepeat = 'no-repeat',
+        backgroundPosition = 'center'
+      ) %>%
+      formatStyle(
+        'gmedian',
+        background = styleColorBar(res$gmedian, 'azure'),
+        backgroundSize = '100% 90%',
+        backgroundRepeat = 'no-repeat',
+        backgroundPosition = 'center'
+      ) %>%
+      formatStyle(
+        'gwmean',
+        background = styleColorBar(res$gwmean, 'azure'),
+        backgroundSize = '100% 90%',
+        backgroundRepeat = 'no-repeat',
+        backgroundPosition = 'center'
+      )
+}
+```
+
+## Final tables {.tabset}
+
+### Isotopic composition
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+isotopes_combined <- data.frame()
+if (nrow(fileres_C) > 0) {
+  isotopes_combined <- fileres_C %>% 
+    summarize(C=mean(median), C_cv = sd(median)/mean(median)/sqrt(n())*100) %>% ungroup() 
+}
+if (nrow(fileres_N) > 0) {
+  isotopes_combined <- isotopes_combined %>%  
+    full_join(
+      fileres_N %>% 
+        summarize(N=mean(median), N_cv = sd(median)/mean(median)/sqrt(n())*100) %>% ungroup()
+    ) 
+}
+if (nrow(fileres_H) > 0) {
+  isotopes_combined <- isotopes_combined %>% 
+    full_join(
+      fileres_H %>% 
+        summarize(H=mean(median), H_cv = sd(median)/mean(median)/sqrt(n())*100) %>% ungroup()
+    ) 
+}
+if (nrow(fileres_O) > 0) {
+  isotopes_combined <- isotopes_combined %>% 
+    full_join(
+      fileres_O %>% 
+        summarize(O=mean(median), O_cv = sd(median)/mean(median)/sqrt(n())*100) %>% ungroup()
+  ) 
+}
+aa_data$ion <- factor(
+  aa_data$ion, 
+  levels = (mmad %>% 
+              summarise(n=n(),md=mean(md)) %>%
+              mutate(sortby = ifelse((md>0 & n==nf), md, 1e5)) %>% 
+              arrange(md, desc(n)))$ion)
+isotopes_combined %>% 
+    datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>%  
+    formatSignif(grep('^[CNOH]$', names(isotopes_combined), value=T), 4) %>%
+    formatSignif(grep('^[CNOH]_cv$', names(isotopes_combined), value=T), 3)
+```
+
+### AA-composition
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+aa_abundances %>% 
+  arrange(ion, group) %>% 
+  datatable(extensions = 'Buttons', options = list(
+                                        dom = 'Bfrtip',
+                                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    )) %>% 
+  formatRound("abundance", 2) %>%
+  formatStyle(
+      'abundance',
+      background = styleColorBar(aa_abundances$abundance, 'azure'),
+      backgroundSize = '100% 90%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
+    )
+```
+
+
+## Final plots {.tabset}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=12}
+isotopes_se <- data.frame()
+if (nrow(fileres_C) > 0)
+  isotopes_se <- fileres_C %>% 
+    select(ion, group, file, C=mean, C_se = se) 
+if (nrow(fileres_N) > 0)
+  isotopes_se <- isotopes_se %>% 
+    left_join(
+      fileres_N %>% 
+        select(ion, group, file, N=mean, N_se = se)
+    ) 
+if (nrow(fileres_H) > 0)
+  isotopes_se <- isotopes_se %>% 
+    left_join(
+      fileres_H %>% 
+        select(ion, group, file, H=mean, H_se = se)
+    ) 
+if (nrow(fileres_O) > 0)
+  isotopes_se <- isotopes_se %>% 
+    left_join(
+      fileres_O %>% 
+        select(ion, group, file, O=mean, O_se = se)
+    ) 
+if (nrow(isotopes_se) > 0)
+  isotopes_se <- isotopes_se %>% 
+    filter(ion %in% c('any','P','L','V','Pyr','H','F'))
+gp_CN <- gp_CH <- gp_CO <- gp_NH <- gp_NO <- gp_HO <- ggplot() + theme_minimal()
+if("C" %in% names(isotopes_se) & "N" %in% names(isotopes_se)) 
+  gp_CN <- isotopes_se %>% 
+    ggplot(aes(
+      x=C, xmin=C-1.96*C_se, xmax=C+1.96*C_se, 
+      y=N, ymin=N-1.96*N_se, ymax=N+1.96*N_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+if("C" %in% names(isotopes_se) & "H" %in% names(isotopes_se)) 
+  gp_CH <- isotopes_se %>% 
+    ggplot(aes(
+      x=C, xmin=C-1.96*C_se, xmax=C+1.96*C_se, 
+      y=H, ymin=H-1.96*H_se, ymax=H+1.96*H_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+if("C" %in% names(isotopes_se) & "O" %in% names(isotopes_se)) 
+  gp_CO <- isotopes_se %>% 
+    ggplot(aes(
+      x=C, xmin=C-1.96*C_se, xmax=C+1.96*C_se, 
+      y=O, ymin=O-1.96*O_se, ymax=O+1.96*O_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+if("N" %in% names(isotopes_se) & "H" %in% names(isotopes_se)) 
+  gp_NH <- isotopes_se %>% 
+    ggplot(aes(
+      x=N, xmin=N-1.96*N_se, xmax=N+1.96*N_se, 
+      y=H, ymin=H-1.96*H_se, ymax=H+1.96*H_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+if("N" %in% names(isotopes_se) & "O" %in% names(isotopes_se)) 
+  gp_NO <- isotopes_se %>% 
+    ggplot(aes(
+      x=N, xmin=N-1.96*N_se, xmax=N+1.96*N_se, 
+      y=O, ymin=O-1.96*O_se, ymax=O+1.96*O_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+if("H" %in% names(isotopes_se) & "O" %in% names(isotopes_se)) 
+  gp_HO <- isotopes_se %>% 
+    ggplot(aes(
+      x=H, xmin=H-1.96*H_se, xmax=H+1.96*H_se, 
+      y=O, ymin=O-1.96*O_se, ymax=O+1.96*O_se,
+      color=group)) + geom_point()+geom_errorbar()+geom_errorbarh()+ theme_minimal() + facet_wrap(~ion, scales = 'free') + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#grid.arrange(
+#  gp_CN,
+#  gp_CH,
+#  gp_CO,
+#  gp_NH,
+#  gp_NO,
+#  gp_HO)
+print(gp_CN)
+print(gp_CH)
+print(gp_CO)
+print(gp_NH)
+print(gp_NO)
+print(gp_HO)
+```

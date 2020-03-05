@@ -181,7 +181,7 @@ lm_eqn = function(df){
   m = summary(lm(y ~ x, df,method = "qr"))
   cr = cor(y = df$y,  x = df$x, method = "pearson")
   eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
-                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(100*m$coefficients[1],5)),
+                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(m$coefficients[1],5)),
                     " ,R2 = ", round(m$r.squared,3) ,sep = ""),
               paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
   eq <- as.character(eq)
@@ -191,17 +191,17 @@ df <- aa_data %>% mutate(y = gamma, x= logI) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
 df <- left_join(df, out, by = "ion")
 df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
-hj <- df %>% group_by(ion) %>% dplyr::summarise(xp = min(x)+(max(x)-min(x))/2, hp = 100*max(y))
+hj <- df %>% group_by(ion) %>% dplyr::summarise(xp = min(x)+(max(x)-min(x))/2, hp = max(y))
 eq <- plyr::ddply(df,"ion",lm_eqn)
 eq <- left_join(eq,hj, by = c("ion"))
 
 df %>%
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=x, y=100*y, group=file, color=group)) + 
+  ggplot(aes(x=x, y=y, group=file, color=group)) + 
     geom_point(size=1, alpha=0.4) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
     theme_bw() + 
     geom_text(data=eq,aes(x = xp, y = hp,label=V1), parse = F, inherit.aes=FALSE, check_overlap = T) + 
-    facet_grid(.~ion) + 
+    facet_wrap(.~ion , scales = "free_x") + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('log2(AUC), a.u.') +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logI
@@ -439,22 +439,34 @@ aa_data %>%
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('RT, min') +
     ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_rt
-    
-    
-sm <- cor(x = aa_data$logI, y= aa_data$gamma , method = "pearson")
-ll <- summary(lm(c(100*aa_data$gamma)~ aa_data$logI, method = "qr"))
-eqn <- paste(paste("y = ", round(ll$coefficients[2],3), "*x", round(ll$coefficients[1],5), " ,R2 = ", round(ll$r.squared,3) ,sep = ""),paste("Correlation = ", round(sm,3), sep = ""), sep = '\n')
 
-aa_data %>% 
+lm_eqn = function(df){
+  m = summary(lm(y ~ x, df,method = "qr"))
+  cr = cor(y = df$y,  x = df$x, method = "pearson")
+  eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
+                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(m$coefficients[1],5)),
+                    " ,R2 = ", round(m$r.squared,3) ,sep = ""),
+              paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
+  eq <- as.character(eq)
+  }    
+
+df <- aa_data %>% mutate(y = 100*gamma, x= logI) %>% select(y,x,ion,file, group)
+out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
+df <- left_join(df, out, by = "ion")
+df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
+hj <- df %>% group_by(ion) %>% dplyr::summarise(xp = min(x)+(max(x)-min(x))/2, hp = max(y))
+eq <- plyr::ddply(df,"ion",lm_eqn)
+eq <- left_join(eq,hj, by = c("ion"))
+
+df %>%
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=logI, y=100*gamma, group=file, color=group)) + 
-    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+  ggplot(aes(x=x, y=y, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
     theme_bw() + 
-    facet_grid(.~ion) + 
+    geom_text(data=eq,aes(x = xp, y = hp,label=V1), parse = F, inherit.aes=FALSE, check_overlap = T) + 
+    facet_wrap(.~ion , scales = "free_x") + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
-    xlab('log2(AUC), a.u.') + scale_x_log10()+
-    annotate(geom="text", x=min(aa_data$logI), y=100*max(aa_data$gamma), label=eqn,
-               color="red") +
+    xlab('log2(AUC), a.u.') +
     ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_logI
     
 aa_data %>%
@@ -670,13 +682,6 @@ aa_data <- aa_data %>%
   left_join(ldI_models, by=c('group','ion')) %>% 
   mutate(gamma=gamma - ldI*estimate)
 
-Pro <- which(levels(aa_data$ion)=="P")
-Leu <- which(levels(aa_data$ion)=="L")
-any <- which(levels(aa_data$ion)=="any")
-Hyp <- which(levels(aa_data$ion)=="Hyp")
-
-
-ion_plot_ <- levels(aa_data$ion)[1:4]
 ion_plot <- IOI_
 
 aa_data %>% 
@@ -691,12 +696,41 @@ aa_data %>%
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=logI, y=1e6*gamma, color=group, group=file)) + 
-    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+  ggplot(aes(x=rt/60, y=100*gamma, group=file,color=group)) + 
+    geom_point(size=1, alpha=0.2) + #geom_smooth() +
     theme_bw() + 
-    facet_grid(ion~.) + 
+    facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
-    xlab('log2(AUC), a.u.') + scale_x_log10() +
+    xlab('RT, min') +
+    ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_rt
+
+lm_eqn = function(df){
+  m = summary(lm(y ~ x, df,method = "qr"))
+  cr = cor(y = df$y,  x = df$x, method = "pearson")
+  eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
+                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(m$coefficients[1],5)),
+                    " ,R2 = ", round(m$r.squared,3) ,sep = ""),
+              paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
+  eq <- as.character(eq)
+  }    
+
+df <- aa_data %>% mutate(y = 1e6*gamma, x= logI) %>% select(y,x,ion,file, group)
+out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
+df <- left_join(df, out, by = "ion")
+df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
+hj <- df %>% group_by(ion) %>% dplyr::summarise(xp = min(x)+(max(x)-min(x))/2, hp = max(y))
+eq <- plyr::ddply(df,"ion",lm_eqn)
+eq <- left_join(eq,hj, by = c("ion"))
+
+df %>%
+  filter(ion %in% ion_plot) %>% 
+  ggplot(aes(x=x, y=y, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
+    theme_bw() + 
+    geom_text(data=eq,aes(x = xp, y = hp,label=V1), parse = F, inherit.aes=FALSE, check_overlap = T) + 
+    facet_wrap(.~ion , scales = "free_x") + 
+    theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
+    xlab('log2(AUC), a.u.') +
     ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_logI
     
 aa_data %>%

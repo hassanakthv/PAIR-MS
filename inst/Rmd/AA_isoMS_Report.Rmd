@@ -15,6 +15,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(isoms)
 library(ggplot2)
+library(plyr)
 library(dplyr)
 library(tidyr)
 library(broom)

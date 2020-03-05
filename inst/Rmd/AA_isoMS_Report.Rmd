@@ -20,19 +20,7 @@ library(tidyr)
 library(broom)
 library(gridExtra)
 library(DT)
-require(limma)
 require(knitr)
-
-lm_eqn = function(df){
-  m = summary(lm(y ~ x, df,method = "qr"))
-  cr = cor(y = df$y,  x = df$x, method = "pearson")
-  eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
-                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(100*m$coefficients[1],5)),
-                    " ,R2 = ", round(m$r.squared,3) ,sep = ""),
-              paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
-  eq <- as.character(eq)
-  }
-
 
 
 
@@ -189,6 +177,15 @@ aa_data %>%
     xlab('RT, min') +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_rt
     
+lm_eqn = function(df){
+  m = summary(lm(y ~ x, df,method = "qr"))
+  cr = cor(y = df$y,  x = df$x, method = "pearson")
+  eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
+                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(100*m$coefficients[1],5)),
+                    " ,R2 = ", round(m$r.squared,3) ,sep = ""),
+              paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
+  eq <- as.character(eq)
+  }    
 
 df <- aa_data %>% mutate(y = gamma, x= logI) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))

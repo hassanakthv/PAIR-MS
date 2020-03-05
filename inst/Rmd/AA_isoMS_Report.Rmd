@@ -20,7 +20,20 @@ library(tidyr)
 library(broom)
 library(gridExtra)
 library(DT)
+require(limma)
 require(knitr)
+
+lm_eqn = function(df){
+  m = summary(lm(y ~ x, df,method = "qr"))
+  cr = cor(y = df$y,  x = df$x, method = "pearson")
+  eq <- paste(paste("Y = ", round(m$coefficients[2],4), "*X",
+                    if_else(sign(round(m$coefficients[1]))>0," + "," - "),abs(round(100*m$coefficients[1],5)),
+                    " ,R2 = ", round(m$r.squared,3) ,sep = ""),
+              paste("Correlation = ", round(cr,3), sep = ""), sep = '\n')
+  eq <- as.character(eq)
+  }
+
+
 
 
 ```
@@ -176,21 +189,24 @@ aa_data %>%
     xlab('RT, min') +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_rt
     
-    
-sm <- cor(x = aa_data$logI, y= aa_data$gamma , method = "pearson")
-ll <- summary(lm(c(100*aa_data$gamma)~ aa_data$logI, method = "qr"))
-eqn <- paste(paste("y = ", round(ll$coefficients[2],3), "*x", round(ll$coefficients[1],5), " ,R2 = ", round(ll$r.squared,3) ,sep = ""),paste("Correlation = ", round(sm,3), sep = ""), sep = '\n')
 
-aa_data %>%
+df <- aa_data %>% mutate(y = gamma, x= logI) %>% select(y,x,ion,file, group)
+out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
+df <- left_join(df, out, by = "ion")
+df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
+hj <- df %>% group_by(ion) %>% dplyr::summarise(xp = min(x)+(max(x)-min(x))/2, hp = 100*max(y))
+eq <- ddply(df,.(ion),lm_eqn)
+eq <- left_join(eq,hj, by = c("ion"))
+
+df %>%
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=logI, y=100*gamma, group=file, color=group)) + 
-    geom_point(size=1, alpha=0.4) + #geom_smooth() +
+  ggplot(aes(x=x, y=100*y, group=file, color=group)) + 
+    geom_point(size=1, alpha=0.4) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
     theme_bw() + 
+    geom_text(data=eq,aes(x = xp, y = hp,label=V1), parse = F, inherit.aes=FALSE, check_overlap = T) + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('log2(AUC), a.u.') +
-    annotate(geom="text", x=10, y=100*max(aa_data$gamma), label=eqn,
-               color="red") +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logI
     
 aa_data %>%

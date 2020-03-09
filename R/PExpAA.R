@@ -1,5 +1,5 @@
 PExpAA <- function (file = "experimentDesign.csv", ioi = list(iointrest), ioi_ = list(iontoshow),
-          correct = TRUE) 
+          correct = TRUE, batcheff = TRUE) 
 {
   library(isoms)
   args_ <- commandArgs(trailingOnly = TRUE)
@@ -44,5 +44,5 @@ PExpAA <- function (file = "experimentDesign.csv", ioi = list(iointrest), ioi_ =
                                                           ldI = log10(dI)) %>% mutate(ltic = log10(tic)) %>%
                                                           filter(group==ion)
   SummarizeAA(data = data_, group = "group", resultPath = outdir, 
-                     correct = correct, IOI = ioi, Info = expDesign[1, 10:ncol(expDesign)], IOI_ = ioi_)
+                     correct = correct, IOI = ioi, Info = expDesign[1, 10:ncol(expDesign)], IOI_ = ioi_, batcheff = batcheff)
 }

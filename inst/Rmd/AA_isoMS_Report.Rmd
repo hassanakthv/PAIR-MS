@@ -187,7 +187,7 @@ lm_eqn = function(df){
   eq <- as.character(eq)
   }    
 
-df <- aa_data %>% mutate(y = gamma, x= logI) %>% select(y,x,ion,file, group)
+df <- aa_data %>% mutate(y = 100*gamma, x= logI) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
 df <- left_join(df, out, by = "ion")
 df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
@@ -702,7 +702,7 @@ aa_data %>%
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab('RT, min') +
-    ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_rt
+    ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_rt
 
 lm_eqn = function(df){
   m = summary(lm(y ~ x, df,method = "qr"))

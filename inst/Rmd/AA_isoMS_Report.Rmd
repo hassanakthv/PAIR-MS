@@ -187,7 +187,7 @@ lm_eqn = function(df){
   eq <- as.character(eq)
   }    
 
-df <- aa_data %>% mutate(y = 100*gamma, x= log10(I)) %>% select(y,x,ion,file, group)
+df <- aa_data %>% mutate(y = 100*gamma, x= log10(2^logI)) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
 df <- left_join(df, out, by = "ion")
 df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
@@ -450,7 +450,7 @@ lm_eqn = function(df){
   eq <- as.character(eq)
   }    
 
-df <- aa_data %>% mutate(y = 100*gamma, x= log10(I)) %>% select(y,x,ion,file, group)
+df <- aa_data %>% mutate(y = 100*gamma, x= log10(2^logI)) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
 df <- left_join(df, out, by = "ion")
 df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
@@ -704,7 +704,7 @@ lm_eqn = function(df){
   eq <- as.character(eq)
   }    
 
-df <- aa_data %>% mutate(y = 1e6*gamma, x= log10(I)) %>% select(y,x,ion,file, group)
+df <- aa_data %>% mutate(y = 1e6*gamma, x= log10(2^logI)) %>% select(y,x,ion,file, group)
 out <- df %>% group_by(ion) %>% dplyr::summarise(mx = median(x), mxmd = sd(x))
 df <- left_join(df, out, by = "ion")
 df <- df %>% filter(x < mx + 3*mxmd & x > mx - 3*mxmd)
@@ -950,7 +950,7 @@ aa_data %>%
   
   aa_data %>% 
     filter(ion %in% ion_plot) %>% 
-    ggplot(aes(x=log10(I), y=100*gamma, color=group, group=file)) + 
+    ggplot(aes(x=log10(2^logI), y=100*gamma, color=group, group=file)) + 
       geom_point(size=1, alpha=0.2) + #geom_smooth() +
       theme_bw() + 
       facet_grid(ion~.) + 

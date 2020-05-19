@@ -171,7 +171,7 @@ analyze_immoniums_ <- function(file, width=0.001, ions=AAIons, fixSigma=T){
   message(sprintf("Reading file [%s]", file))
   msrun <- openMSfile(file, backend = "Ramp")
   hd <- header(msrun)
-  immscans <- which(hd$msLevel==1)
+  immscans <- which(hd$collisionEnergy==0)
   message(sprintf("\t%d immonium scans found", length(immscans)))
   result <- data.frame()
   message("Processing:")

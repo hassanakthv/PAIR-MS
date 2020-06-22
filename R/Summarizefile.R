@@ -150,7 +150,7 @@ Summarizefile <- function(data = NA,
       cl <- new_cluster(2)
       cluster_library(cl, "dplyr")
       cluster_library(cl, "isoms")
-      set_default_cluster(cl)
+      default_cluster(cl)
       gpb <- partition
       rw <- partition
     }
@@ -335,7 +335,7 @@ summarizeImmoniums2 <- function(data = NA, files = NA, group = ifelse(is.na(data
       library(multidplyr)
       cl <- new_cluster(2)
       cluster_library(cl, "dplyr")
-      set_default_cluster(cl)
+      default_cluster(cl)
       gpb <- partition
     }
     
@@ -508,7 +508,7 @@ summarizeImmoniumsLoess <- function(data = NA, files = NA, group = ifelse(is.na(
       library(multidplyr)
       cl <- new_cluster(2)
       cluster_library(cl, "dplyr")
-      set_default_cluster(cl)
+      default_cluster(cl)
       gpb <- partition
     }
     

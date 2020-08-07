@@ -183,12 +183,12 @@ aa_data %>%
 
 aa_data %>%
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=tic, y=100*gamma, group=file, color=group)) + 
+  ggplot(aes(x=log10(tic), y=100*gamma, group=file, color=group)) + 
     geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
-    xlab(expression(paste("TIC, ",Log[10],sep = ""))) + scale_x_log10() +
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) +
     ylab(bquote(''^13*'C'/''^12*'C, (%)')) -> g_logI
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -422,12 +422,12 @@ aa_data %>%
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=tic, y=100*gamma, group=file, color=group)) + 
+  ggplot(aes(x=log10(tic), y=100*gamma, group=file, color=group)) + 
     geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
     facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
-    xlab(expression(paste("TIC, ",Log[10],sep = ""))) + scale_x_log10()+
+    xlab(expression(paste("TIC, ",Log[10],sep = ""))) + 
     ylab(bquote(''^15*'N'/''^14*'N, (%)')) -> g_logI
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
@@ -652,10 +652,10 @@ aa_data %>%
 
 aa_data %>% 
   filter(ion %in% ion_plot) %>% 
-  ggplot(aes(x=tic, y=1e6*gamma, color=group, group=file)) + 
+  ggplot(aes(x=log10(tic), y=1e6*gamma, color=group, group=file)) + 
     geom_point(size=1, alpha=0.4) + #geom_smooth() +
     theme_bw() + 
-    facet_grid(ion~.) + 
+    facet_grid(.~ion) + 
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 
     xlab(expression(paste("TIC, ",Log[10],sep = ""))) + scale_x_log10() +
     ylab(bquote(''^2*'H'/''^1*'H, ppm')) -> g_logI
@@ -676,11 +676,11 @@ aa_data %>%
   filter(ion %in% ion_plot) %>% 
   group_by(ion, group,file) %>% 
   summarize(
-    mean=mean(gamma)*100, 
-    median=median(gamma)*100, 
-    wmean = weighted.mean(gamma, logI)*100, 
-    sd = sd(gamma)*100, 
-    se = sd(gamma)/sqrt(n())*100, 
+    mean=mean(gamma)*1e6, 
+    median=median(gamma)*1e6, 
+    wmean = weighted.mean(gamma, logI)*1e6, 
+    sd = sd(gamma)*1e6, 
+    se = sd(gamma)/sqrt(n())*1e6, 
     n=n(), 
     tic=median(log10(tic),na.rm=T)) %>% 
   arrange(tic) %>% 

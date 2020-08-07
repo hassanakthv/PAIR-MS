@@ -883,6 +883,7 @@ aa_data %>%
       xlab(expression(paste("TIC, ",Log[10],sep = ""))) + scale_x_log10() +
       ylab(bquote(''^18*'O'/''^16*'O, (%)')) -> g_logI
   aa_data %>% 
+    filter(ion %in% ion_plot) %>%
     ggplot(aes(x=file, y=100*gamma, fill=group)) + geom_boxplot( outlier.color = NA, notch=T)  +
     theme_bw() +
     theme(legend.position = "",axis.text.x = element_text(angle = 90, hjust = 1))+ 

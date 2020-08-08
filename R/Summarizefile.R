@@ -147,10 +147,10 @@ Summarizefile <- function(data = NA,
     rw <- dplyr::rowwise
     if ("multidplyr" %in% installed.packages()) {
       library(multidplyr)
-      cl <- new_cluster(2)
+      cl <- create_cluster()
       cluster_library(cl, "dplyr")
       cluster_library(cl, "isoms")
-      cluster_assign_partition(cl)
+      set_default_cluster(cl)
       gpb <- partition
       rw <- partition
     }

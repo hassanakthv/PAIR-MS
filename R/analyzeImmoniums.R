@@ -41,7 +41,7 @@ analyze_immoniums <- function(file, width=0.001, ions=immoniumIons, fixSigma=T){
         if("O" %in% names(ions[[ion_]]) & ions[[ion_]]["O"] > 0)
           peaks <- c(peaks, "18O")
         if(ss_range>5){
-          cres <- get_isopeaks(ss, mz, width=width, npoint=6, fixSigma=fixSigma, peaks=peaks)
+          cres <- get_isopeaks_(ss, mz, width=width, npoint=6, fixSigma=fixSigma, peaks=peaks)
         }else{
           cres <- get_isopeaks_nomono(ss, mz, width=width, npoint=6, fixSigma=fixSigma)
         }

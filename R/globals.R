@@ -39,7 +39,7 @@ immoniumIons = list(
   "Hyp2" = c("C" = 4, "H" = 6, "N" = 1), # 68.05002
   "V1" = c("C" = 4, "H" = 7), # 55.05478
   "V2" = c("C" = 3, "H" = 7, "N" = 1),
-  "OxYF" = c("C"= 8, "H" = 10, "N"= 1, "O" = 3)# 57.05785
+  "OxYF" = c("C"= 8, "H" = 10, "N"= 1, "O" = 2)# 152.0711
   )
 
 # Intact Amino Acid ions: AA +1Hydrogen (+H)

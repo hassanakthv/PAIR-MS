@@ -31,7 +31,7 @@ get_isopeaks <- function(ss, mz, width = 0.002, npoint = 10, tol = 0.01, fixSigm
 
     # Fitting monoisotopic peak
     if (mz == monoMass(immoniumIons[["OxYF"]])){
-        tol = 0.002}
+        tol = 0.005}
     p_int <- findInterval(c(mz - tol, mz + tol), ss[, 1])
     if (diff(p_int) < npoint) {
         warning(sprintf("No peak found at mz=%.4f with tol=%.4f", mz, tol))

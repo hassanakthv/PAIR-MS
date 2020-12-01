@@ -45,7 +45,7 @@ analyze_immoniums <- function(file, width=0.001, ions=immoniumIons, fixSigma=T){
         }else{
           cres <- get_isopeaks_nomono(ss, mz, width=width, npoint=6, fixSigma=fixSigma)
         }
-        if(nrow(cres)>1)
+        if(nrow(cres)>=1)
           ires <- ires %>%
             bind_rows(
               cres %>%

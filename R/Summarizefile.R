@@ -196,7 +196,7 @@ Summarizefile <- function(data = NA,
              rt, ion) %>% bind_rows(any_aa) %>% ungroup()
     save(any_aa, all_aa, Info,file = file.path(resultPath, "all_aa.RData"))
     message("Performing LOESS method: ")
-    #cluster_copy(cl, all_aa)
+    
     loess_C <- all_aa %>% ungroup() %>% distinct(group, file, ion) %>% arrange(ion, group,
                                                                                file) %>% rowwise() %>% # rw() %>%
       do({

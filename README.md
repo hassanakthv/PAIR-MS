@@ -1,7 +1,7 @@
 # Protein Amino Acid-resolved Isotopic Ratio Mass Spectrometry (PAIR-MS) 
 *FT IsoR MS data processing library*
 
-In order to measure the isotopic ratio of each elements (CHNO) in a given sample, you need to convert the .raw files to .mzML file using a converter software such as [_MSConvertGUI_] (https://proteowizard.sourceforge.io/download.html). In a routine experiemnt the isotopic ratio will be determined in MS/MS scans with HCD 50. To convert the file from .raw format one should __add HCD and MS 2__ as filters before converting the .raw to .mzML.
+In order to measure the isotopic ratio of each elements (CHNO) in a given sample, you need to convert the .raw files to .mzML file using a converter software such as [_MSConvertGUI_](https://proteowizard.sourceforge.io/download.html). In a routine experiemnt the isotopic ratio will be determined in MS/MS scans with HCD 50. To convert the file from .raw format one should __add HCD and MS 2__ as filters before converting the .raw to .mzML.
 
 To have a nice information about the samples and experiment, you need to provide a .csv file (Experiment Design) with the name of these columns in the same order:
 

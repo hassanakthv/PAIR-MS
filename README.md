@@ -43,3 +43,8 @@ Note that the list can be a list or matrix of string where each amino acid is sh
 For example : c("G","P","L") ---> Glycine, Proline and Leucine are the amino acids that one is looking to analyze.
 
 
+
+# Online Version of PAIR-MS is availaibe (below link)
+![WorkFlow_PAIRMS](https://user-images.githubusercontent.com/43888767/178272953-a5a58f9f-5f04-4caa-a90c-ac7717670f7c.png)
+
+

@@ -44,7 +44,7 @@ For example : c("G","P","L") ---> Glycine, Proline and Leucine are the amino aci
 
 
 
-# Online Version of PAIR-MS is availaibe (below link)
+# Online Version of PAIR-MS will be available soon (below link)
 
 Link to PAIR-MS online version
 

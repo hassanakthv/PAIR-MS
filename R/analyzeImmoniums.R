@@ -54,7 +54,8 @@ analyze_immoniums <- function(file, width=0.001, ions=immoniumIons, fixSigma=T){
                   tic = dd$totIonCurrent[[1]],
                   bpI = dd$basePeakIntensity[[1]],
                   bpMZ = dd$basePeakMZ[[1]],
-                  ion=ion_)
+                  ion=ion_, 
+                  PrecursorMZ = dd$precursorMZ[[1]])
             )
       }
       ires$n <- apply(ires, 1, function(x)ions[[x["ion"]]][sub("\\d+","",x["peak"])])

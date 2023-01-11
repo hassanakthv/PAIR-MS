@@ -5,7 +5,7 @@ TMT_Contamination <- c(126.1277, 127.1247, 127.1310, 128.1281, 128.1344, 129.131
 
 
 
-fitG =
+fitG <-
   function(x,y,mu,sig,scale){
     
     f = function(p){

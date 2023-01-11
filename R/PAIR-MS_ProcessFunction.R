@@ -3,7 +3,7 @@ iion <- c("P", "Hyp", "L/I", "R", "R2", "K", "Hyl", "A", "H", "F", "S","V", "Y",
           "m73","m87","M","C","camC","xC","W")
 
 
-PAIRMS <- function (file = "experimentDesign.csv", data_tab, outdir, ioi = list(iointrest), 
+PAIRMS <- function (file = "experimentDesign.csv", data_tab = NA, outdir, ioi = list(iointrest), 
           ioi_ = list(iontoshow), correct = TRUE) 
 {
   iion <- c("P", "Hyp", "L/I", "R", "R2", "K", "Hyl", "A", "H", "F", "S","V", "Y", "N","N2","D","Q","E","T","Pyr","m57","K2","m89",

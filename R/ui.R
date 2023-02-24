@@ -1,5 +1,6 @@
 library(markdown)
-b64 <- base64enc::dataURI(file="PAIR-MS logo_wback.png", mime="image/png")
+#b64 <- base64enc::dataURI(file="PAIR-MS logo_wback.png", mime="image/png")
+bs64 <- "https://github.com/hassanakthv/PAIR-MS/blob/master/PAIR-MS%20logo_wback.png"
 navbarPage(theme = shinytheme("flatly"),
            tags$head(
              tags$style(HTML('.navbar-nav > li > a, .navbar-brand {

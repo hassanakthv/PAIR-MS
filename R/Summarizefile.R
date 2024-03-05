@@ -67,7 +67,7 @@ Summarizefile <- function(data = NA,
   
 })
 
-  data <- left_join(data, data_new, by = c("seqNum", "ion", "rt", "file")) %>% rowwise() %>% mutate(isoratio = ifelse(peak!=0, new_isoratio, isoratio)) %>%
+  data <- left_join(data, data_new, by = c("seqNum", "ion", "rt", "file", "peak")) %>% rowwise() %>% mutate(isoratio = ifelse(peak!=0, new_isoratio, isoratio)) %>%
   ungroup() %>% select(-new_isoratio)
   # removing outliers
   ranges <- data %>%

@@ -53,7 +53,22 @@ Summarizefile <- function(data = NA,
   nomono_spectra <- setdiff(spectra, mono_spectra)
  
   data <- data %>% filter(ion %in% IOI)
- 
+  data_new <- data %>% group_by(seqNum, ion, rt, file) %>% do({
+  rres__ <- data.frame()
+  ff__ = .
+  for (i in setdiff(ff__$peak, 0)){
+    irr <- (ff__ %>% filter(peak == i))$I[1]
+    rset <- sum((ff__ %>% filter(peak != i))$I)
+    rres__ <- rres__ %>% bind_rows(data.frame(new_isoratio = irr/rset, peak = i, ion = ff__$ion[1]))
+  }
+  
+  rres__
+  
+  
+})
+
+  data <- left_join(data, data_new, by = c("seqNum", "ion", "rt", "file")) %>% rowwise() %>% mutate(isoratio = ifelse(peak!=0, new_isoratio, isoratio)) %>%
+  ungroup() %>% select(-new_isoratio)
   # removing outliers
   ranges <- data %>%
     group_by(file, peak, ion) %>%
@@ -176,10 +191,14 @@ Summarizefile <- function(data = NA,
         rs <- rs[rs < 1]
         rsn <- rs/ns
         rs_good <- (abs(rsn - weighted.mean(rsn, i0s)) < 2.5 * mad(rsn))
+        i0ss <- i0s[rs_good]
+        i_good <- i0ss/sum(i0ss) > .1
+        i0ss <- i0ss[i_good]
+        rrs <- rrs[i_good]
         r <- sum(i1s[rs_good]/ns[rs_good])/sum(i0s[rs_good])
         if (!is.na(r))
-          res <- res %>% bind_rows(data.frame(peak = el, gamma = r, logI = log2(sum(i0s[rs_good])),
-                                              tic = tic_, dI = sum(i0s[rs_good])/tic_, ldI = log10(sum(i0s[rs_good])/tic_),
+          res <- res %>% bind_rows(data.frame(peak = el, gamma = weighted.mean(rrs, i0ss), logI = log2(sum(i0s[i_good])),
+                                              tic = tic_, dI = sum(i0s[i_good])/tic_, ldI = log10(sum(i0s[i_good])/tic_),
                                               ltic = ltic_))
       }
       if (nrow(res) > 0) {

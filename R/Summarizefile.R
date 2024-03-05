@@ -191,6 +191,7 @@ Summarizefile <- function(data = NA,
         rs <- rs[rs < 1]
         rsn <- rs/ns
         rs_good <- (abs(rsn - weighted.mean(rsn, i0s)) < 2.5 * mad(rsn))
+        rrs <- rsn[rs_good]
         i0ss <- i0s[rs_good]
         i_good <- i0ss/sum(i0ss) > .1
         i0ss <- i0ss[i_good]

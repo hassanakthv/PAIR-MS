@@ -53,22 +53,7 @@ Summarizefile <- function(data = NA,
   nomono_spectra <- setdiff(spectra, mono_spectra)
  
   data <- data %>% filter(ion %in% IOI)
-  data_new <- data %>% group_by(seqNum, ion, rt, file) %>% do({
-  rres__ <- data.frame()
-  ff__ = .
-  for (i in setdiff(ff__$peak, 0)){
-    irr <- (ff__ %>% filter(peak == i))$I[1]
-    rset <- sum((ff__ %>% filter(peak != i))$I)
-    rres__ <- rres__ %>% bind_rows(data.frame(new_isoratio = irr/rset, peak = i, ion = ff__$ion[1]))
-  }
-  
-  rres__
-  
-  
-})
 
-  data <- left_join(data, data_new, by = c("seqNum", "ion", "rt", "file", "peak")) %>% rowwise() %>% mutate(isoratio = ifelse(peak!=0, new_isoratio, isoratio)) %>%
-  ungroup() %>% select(-new_isoratio)
   # removing outliers
   ranges <- data %>%
     group_by(file, peak, ion) %>%

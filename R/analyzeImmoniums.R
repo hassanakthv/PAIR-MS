@@ -31,6 +31,7 @@ analyze_immoniums <- function(file, width=0.001, ions=immoniumIons, fixSigma=T){
       dd = .
       ii <- dd$seqNum[[1]]
       ss <- peaks(msrun, ii)
+      ss <- matrix(as.numeric(ss), ncol = 2)
       ss_range <- diff(range(ss[,1]))
       for(ion_ in names(ions)){
         mz = monoMass(ions[[ion_]])

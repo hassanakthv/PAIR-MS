@@ -15,7 +15,8 @@
 #' @examples
 analyze_immoniums <- function(file, width=0.001, ions=immoniumIons, fixSigma=T){
   message(sprintf("Reading file [%s]", file))
-  msrun <- openMSfile(file, backend = "Ramp")
+  #msrun <- openMSfile(file, backend = "Ramp") Older version of MSConvert/mzR and also instrument before Lumos
+  msrun <- openMSfile(file, backend = "pwiz")
   hd <- header(msrun)
   immscans <- which(hd$collisionEnergy>45 & (hd$msLevel>1))
   message(sprintf("\t%d immonium scans found", length(immscans)))

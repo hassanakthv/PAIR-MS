@@ -18,13 +18,13 @@ summarizeImmoniums <- function(data = NA,
                                               NA),
                                resultPath = "./isoMS_result",
                                correct=T, IOI = NA, Info = NA,IOI_ = NA) {
-    if (is.na(data)) {
-        if (class(files) == "character")
-            data <- bind_rows(lapply(files, function(f) {
-                if (file.exists(f))
-                  read_csv(f) %>% mutate(file = f) else data.frame()
-            }))
-    }
+  #  if (is.na(data)) {
+  #      if (class(files) == "character")
+  #          data <- bind_rows(lapply(files, function(f) {
+  #              if (file.exists(f))
+  #                read_csv(f) %>% mutate(file = f) else data.frame()
+  #          }))
+  #  }
     if (nrow(data) < 2) {
         warning("You have to provide either data frame or vecor of file names to proceed")
         return(0)

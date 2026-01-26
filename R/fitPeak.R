@@ -51,11 +51,11 @@ fitPeak <- function(x, y, startPars = c(mu = 70.065, I = 5000, sigma = 3e-04), m
             m <- try(nls(formula = fitFct, start = parTmp, data = list(x = xVec, y = yVec), na.action = na.exclude, algorithm = "port"), silent = TRUE)
             attempts <- attempts + 1
             varyPars <- 1
-            if (class(m) != "try-error") {
+            if (!inherits(m, "try-error")){
                 mcoef <- try(tidy(m), silent = TRUE)
-                if (class(mcoef) != "try-error") 
+                if (!inherits(mcoef, "try-error"))
                   repeatLoop <- FALSE
-            }
+      }
         }
     }
     return(m)
